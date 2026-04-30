@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Header from "@/components/shared/Header";
 import TabBar from "@/components/shared/TabBar";
+import TopNav from "@/components/shared/TopNav";
 import StatusBar from "@/components/dashboard/StatusBar";
 import OverviewTab from "@/components/dashboard/OverviewTab";
 import SummaryTab from "@/components/dashboard/SummaryTab";
@@ -35,6 +36,7 @@ export default function DashboardPage() {
 
   return (
     <main className="max-w-[920px] mx-auto px-4 pb-16 pt-4">
+      <TopNav current="dashboard" />
       <Header
         eyebrow="Class dashboard"
         title={`Stream survey ${CONFIG.YEAR}`}

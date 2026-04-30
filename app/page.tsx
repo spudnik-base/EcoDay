@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Header from "@/components/shared/Header";
 import TabBar from "@/components/shared/TabBar";
+import TopNav from "@/components/shared/TopNav";
 import SiteTab from "@/components/survey/SiteTab";
 import AbioticTab from "@/components/survey/AbioticTab";
 import BioticTab from "@/components/survey/BioticTab";
@@ -38,6 +39,7 @@ export default function SurveyPage() {
 
   return (
     <main className="max-w-[460px] mx-auto px-3 pb-16 pt-3">
+      <TopNav current="survey" />
       <Header
         eyebrow="Field journal"
         title={`Stream survey ${CONFIG.YEAR}`}
