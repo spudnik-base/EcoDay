@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leysin Stream Survey — Class Dashboard</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; background: #f0f0ee; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #111; }
+  body { padding: 0 0 60px; }
+  .container { max-width: 900px; margin: 0 auto; padding: 0 16px; }
+
+  /* ── header ── */
+  .header { background: #0B1C35; overflow: hidden; margin-bottom: 24px; }
+  .header-inner { padding: 24px 24px 6px; position: relative; }
+  .header-eyebrow { font-size: 11px; color: rgba(232,237,245,0.4); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 5px; }
+  .header-title { font-size: 26px; font-weight: 500; color: #E8EDF5; letter-spacing: -.3px; }
+  .header-sub { font-size: 13px; color: #5DCAA5; margin-top: 4px; }
+  .header-badge { position: absolute; top: 24px; right: 24px; font-size: 12px; padding: 5px 14px; border-radius: 20px; font-weight: 500; }
+  .tabs-bar { display: flex; border-top: 0.5px solid rgba(255,255,255,0.08); margin-top: 6px; }
+  .tab-btn { flex: 1; padding: 11px 0; background: transparent; border: none; border-bottom: 2px solid transparent; color: rgba(232,237,245,0.35); font-size: 12px; font-weight: 400; cursor: pointer; font-family: inherit; letter-spacing: .02em; transition: color .15s; }
+  .tab-btn.active { color: #E8EDF5; border-bottom-color: #5DCAA5; font-weight: 500; }
+
+  /* ── mountains svg ── */
+  .mountains { width: 100%; display: block; margin-bottom: -2px; }
+
+  /* ── status bar ── */
+  .status-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 0 18px; }
+  .status-left { font-size: 12px; color: #888; }
+  .status-left strong { color: #111; }
+  .refresh-btn { font-size: 12px; padding: 6px 14px; border: 0.5px solid #ccc; border-radius: 8px; background: #fff; cursor: pointer; color: #555; font-family: inherit; }
+  .refresh-btn:hover { background: #f5f5f3; }
+  .countdown { font-size: 11px; color: #aaa; margin-left: 10px; }
+
+  /* ── cards grid ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .card { background: #fff; border: 0.5px solid #ddd; border-radius: 12px; padding: 14px 16px; }
+  .card-label { font-size: 11px; color: #888; margin-bottom: 4px; }
+  .card-value { font-size: 32px; font-weight: 500; letter-spacing: -0.5px; line-height: 1; }
+  .card-sub { font-size: 11px; color: #aaa; margin-top: 5px; }
+
+  /* ── section ── */
+  .section { background: #fff; border: 0.5px solid #ddd; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .section-title { font-size: 13px; font-weight: 500; color: #333; margin-bottom: 14px; }
+
+  /* ── site grid ── */
+  .site-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .site-tile { border-radius: 10px; padding: 10px 8px; text-align: center; border: 0.5px solid #eee; }
+  .site-num { font-size: 10px; color: #aaa; margin-bottom: 4px; }
+  .site-bi { font-size: 22px; font-weight: 500; line-height: 1; }
+  .site-flow { font-size: 9px; margin-top: 4px; }
+  .site-group { font-size: 9px; color: #aaa; margin-top: 2px; }
+  .site-empty { background: #f8f8f6; }
+  .site-empty .site-bi { color: #ccc; font-size: 16px; }
+
+  /* ── bar chart ── */
+  .bar-wrap { display: flex; align-items: flex-end; gap: 6px; height: 120px; padding-bottom: 20px; position: relative; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; transition: height .4s ease; position: relative; min-height: 2px; }
+  .bar-val { font-size: 10px; font-weight: 500; position: absolute; top: -16px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+  .bar-lbl { font-size: 9px; color: #aaa; margin-top: 4px; text-align: center; }
+  .bar-axis { position: absolute; bottom: 20px; left: 0; right: 0; height: 0.5px; background: #eee; }
+  .bar-ref { position: absolute; left: 0; right: 0; height: 0.5px; background: #ccc; border-top: 1px dashed #ccc; }
+  .bar-ref-lbl { position: absolute; right: 0; font-size: 9px; color: #aaa; transform: translateY(-10px); }
+
+  /* ── comparison ── */
+  .compare-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid #eee; font-size: 13px; }
+  .compare-row:last-child { border-bottom: none; }
+  .compare-lbl { width: 100px; color: #666; font-size: 12px; flex-shrink: 0; }
+  .compare-bar-wrap { flex: 1; height: 8px; background: #f0f0ee; border-radius: 4px; overflow: hidden; }
+  .compare-bar { height: 100%; border-radius: 4px; transition: width .4s ease; }
+  .compare-val { width: 44px; text-align: right; font-weight: 500; font-size: 12px; flex-shrink: 0; }
+
+  /* ── table ── */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .data-table th { text-align: left; font-weight: 500; font-size: 10px; color: #888; padding: 6px 8px; border-bottom: 0.5px solid #eee; text-transform: uppercase; letter-spacing: .04em; }
+  .data-table td { padding: 8px 8px; border-bottom: 0.5px solid #f0f0f0; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .bi-pill { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .flow-tag { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 10px; background: #f0f0ee; color: #666; }
+  .table-wrap { overflow-x: auto; }
+
+  /* ── empty state ── */
+  .empty { text-align: center; padding: 40px 20px; color: #aaa; font-size: 13px; line-height: 1.8; }
+
+  /* ── page ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── loading ── */
+  .loading { text-align: center; padding: 60px 20px; color: #aaa; font-size: 13px; }
+  .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #eee; border-top-color: #1D9E75; border-radius: 50%; animation: spin .8s linear infinite; margin-bottom: 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-eyebrow" id="hSchool">Leysin American School</div>
+    <div class="header-title" id="hTitle">Stream survey 2026</div>
+    <div class="header-sub" id="hSub">Live class dashboard</div>
+    <div class="header-badge" id="hBadge" style="display:none"></div>
+  </div>
+  <svg class="mountains" viewBox="0 0 900 72" preserveAspectRatio="none">
+    <path d="M0,72 L0,62 C18,60 36,56 52,52 C64,48 76,44 88,40 C96,36 104,32 113,30 C118,28 123,30 128,33 C133,37 136,42 140,47 C144,43 152,39 162,37 C168,34 174,34 180,36 C185,38 188,41 192,44 C196,41 200,38 206,37 C210,36 214,37 218,39 C222,42 225,46 229,51 C233,54 237,57 243,59 C249,57 255,55 261,54 C267,53 273,53 279,54 C283,53 287,51 292,51 C297,50 301,48 306,46 C311,44 316,42 321,42 C325,40 330,37 337,33 C341,30 346,28 351,28 C355,27 359,28 363,30 C367,33 369,37 373,40 C377,36 382,32 389,28 C394,24 399,22 406,21 C411,20 416,21 421,23 C425,26 427,30 431,32 C435,28 440,24 447,20 C452,17 457,15 463,15 C469,15 475,17 481,20 C485,16 490,12 497,9 C502,6 507,5 513,5 C519,5 525,7 531,11 C535,15 539,21 544,27 C549,35 556,46 566,58 L580,64 L900,64 L900,72 Z" fill="#E8EDF5" opacity="0.12"/>
+    <path d="M0,72 L0,65 C20,63 40,59 58,55 C70,52 82,48 94,44 C102,41 110,37 119,34 C124,32 129,33 134,36 C139,40 142,45 146,49 C150,45 158,41 168,39 C174,37 180,37 186,39 C191,41 194,44 198,47 C202,44 206,41 212,40 C216,39 220,40 224,42 C228,45 231,49 235,54 C239,57 243,60 249,62 C255,60 261,58 267,57 C273,56 279,56 285,57 C289,56 293,54 298,54 C303,53 307,51 312,49 C317,47 322,45 327,45 C331,43 336,40 343,36 C347,33 352,31 357,31 C361,30 365,31 369,33 C373,36 375,40 379,43 C383,39 388,35 395,31 C400,27 405,25 412,24 C417,23 422,24 427,26 C431,29 433,33 437,35 C441,31 446,27 453,23 C458,20 463,18 469,18 C475,18 481,20 487,23 C491,19 496,15 503,12 C508,9 513,8 519,8 C525,8 531,10 537,14 C541,18 545,24 550,30 C555,38 562,49 572,61 L590,67 L900,67 L900,72 Z" fill="#E8EDF5" opacity="0.3"/>
+    <path d="M0,72 L0,68 C24,66 48,62 68,58 C82,55 96,51 108,47 C116,44 124,40 133,37 C138,35 143,36 148,39 C153,43 156,48 160,52 C164,48 172,44 182,42 C188,40 194,40 200,42 C205,44 208,47 212,50 C216,47 220,44 226,43 C230,42 234,43 238,45 C242,48 245,52 249,57 C253,60 257,63 263,65 C269,63 275,61 281,60 C287,59 293,59 299,60 C303,59 307,57 312,57 C317,56 321,54 326,52 C331,50 336,48 341,48 C345,46 350,43 357,39 C361,36 366,34 371,34 C375,33 379,34 383,36 C387,39 389,43 393,46 C397,42 402,38 409,34 C414,30 419,28 426,27 C431,26 436,27 441,29 C445,32 447,36 451,38 C455,34 460,30 467,26 C472,23 477,21 483,21 C489,21 495,23 501,26 C505,22 510,18 517,15 C522,12 527,11 533,11 C539,11 545,13 551,17 C555,21 559,27 564,33 C569,41 576,52 586,64 L606,70 L900,70 L900,72 Z" fill="#E8EDF5" opacity="0.65"/>
+    <path d="M0,72 L0,70 C28,68 54,64 76,60 C91,57 106,53 118,49 C126,46 134,42 143,39 C148,37 153,38 158,41 C163,45 166,50 170,54 C174,50 182,46 192,44 C198,42 204,42 210,44 C215,46 218,49 222,52 C226,49 230,46 236,45 C240,44 244,45 248,47 C252,50 255,54 259,59 C263,62 267,65 273,67 C279,65 285,63 291,62 C297,61 303,61 309,62 C313,61 317,59 322,59 C327,58 331,56 336,54 C341,52 346,50 351,50 C355,48 360,45 367,41 C371,38 376,36 381,36 C385,35 389,36 393,38 C397,41 399,45 403,48 C407,44 412,40 419,36 C424,32 429,30 436,29 C441,28 446,29 451,31 C455,34 457,38 461,40 C465,36 470,32 477,28 C482,25 487,23 493,23 C499,23 505,25 511,28 C515,24 520,20 527,17 C532,14 537,13 543,13 C549,13 555,15 561,19 C565,23 569,29 574,35 C579,43 586,54 596,66 L618,72 L900,72 Z" fill="#E8EDF5" opacity="1"/>
+  </svg>
+  <div class="tabs-bar">
+    <button class="tab-btn active" onclick="showTab('overview')">Overview</button>
+    <button class="tab-btn" onclick="showTab('sites')">Sites</button>
+    <button class="tab-btn" onclick="showTab('compare')">Compare</button>
+    <button class="tab-btn" onclick="showTab('data')">All data</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="status-bar">
+    <div class="status-left">
+      <span id="statusText">Loading…</span>
+      <span class="countdown" id="countdown"></span>
+    </div>
+    <button class="refresh-btn" onclick="fetchData()">Refresh now</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="page active" id="page-overview">
+    <div class="cards" id="statCards">
+      <div class="card"><div class="card-label">Groups submitted</div><div class="card-value" id="cGroups">—</div><div class="card-sub" id="cGroupsSub"></div></div>
+      <div class="card"><div class="card-label">Class avg biotic index</div><div class="card-value" id="cBI">—</div><div class="card-sub" id="cBISub"></div></div>
+      <div class="card"><div class="card-label">Avg Simpson's D</div><div class="card-value" id="cSD">—</div><div class="card-sub">stream diversity</div></div>
+      <div class="card"><div class="card-label">Sites covered</div><div class="card-value" id="cSites">—</div><div class="card-sub" id="cSitesSub"></div></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Biotic index by site</div>
+      <div id="biChart"><div class="empty">No data yet — waiting for first submission</div></div>
+    </div>
+  </div>
+
+  <!-- SITES -->
+  <div class="page" id="page-sites">
+    <div class="section">
+      <div class="section-title">Site-by-site summary</div>
+      <div class="site-grid" id="siteGrid"></div>
+    </div>
+  </div>
+
+  <!-- COMPARE -->
+  <div class="page" id="page-compare">
+    <div class="section">
+      <div class="section-title">Pool vs riffle — biotic index</div>
+      <div id="flowCompare"><div class="empty">Not enough data yet</div></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Stream Simpson's D by site</div>
+      <div id="simpsonChart"><div class="empty">Not enough data yet</div></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Altitude vs biotic index</div>
+      <div id="altChart"><div class="empty">Not enough data yet — requires GPS capture</div></div>
+    </div>
+  </div>
+
+  <!-- DATA TABLE -->
+  <div class="page" id="page-data">
+    <div class="section">
+      <div class="section-title">All submissions</div>
+      <div class="table-wrap">
+        <table class="data-table" id="dataTable">
+          <thead><tr><th>Group</th><th>Site</th><th>Flow</th><th>Biotic index</th><th>Simpson's D</th><th>Alt (m)</th><th>Lux</th><th>pH</th><th>Temp (°C)</th><th>Nitrate</th><th>Time</th></tr></thead>
+          <tbody id="tableBody"><tr><td colspan="11" style="text-align:center;color:#aaa;padding:30px">No data yet</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  FIELD DAY CONFIG — edit these at the start of each year
+// ═══════════════════════════════════════════════════════════════
+const CONFIG = {
+  WEBHOOK:      "https://script.google.com/macros/s/AKfycbyf8etVUXXtA5XNlfZ4KGCkDpCxN15hdCTeWt1HcElTS2RXMEv1DG3RqdLFU0CYjRyqFA/exec",
+  YEAR:         2026,
+  SCHOOL:       "Leysin American School",
+  SITE_COUNT:   10,
+  REFRESH_SECS: 30,
+};
+// ═══════════════════════════════════════════════════════════════
+
+const TEAL="#1D9E75", TEAL_L="#E1F5EE", TEAL_D="#085041", TEAL_M="#5DCAA5";
+
+document.getElementById("hSchool").textContent = CONFIG.SCHOOL;
+document.getElementById("hTitle").textContent  = `Stream survey ${CONFIG.YEAR}`;
+
+let allData = [];
+let refreshTimer, countdownTimer, countdownSecs = CONFIG.REFRESH_SECS;
+
+function qualColor(bi) {
+  if (bi === null || isNaN(bi)) return {bg:"#f8f8f6", fg:"#ccc"};
+  if (bi > 10) return {bg:"#EAF3DE", fg:"#27500A"};
+  if (bi >= 3)  return {bg:"#FFF3CD", fg:"#6B4C00"};
+  return              {bg:"#FCEBEB", fg:"#791F1F"};
+}
+
+function fmt(v, d=2) {
+  const n = parseFloat(v);
+  return isNaN(n) ? "—" : n.toFixed(d);
+}
+
+async function fetchData() {
+  clearTimeout(refreshTimer);
+  clearInterval(countdownTimer);
+  document.getElementById("statusText").innerHTML = '<span style="color:#aaa">Fetching…</span>';
+
+  try {
+    const res = await fetch(CONFIG.WEBHOOK);
+    const rows = await res.json();
+    allData = Array.isArray(rows) ? rows : [];
+    render();
+    const t = new Date();
+    document.getElementById("statusText").innerHTML =
+      `<strong>${allData.length}</strong> submission${allData.length!==1?"s":""} — last updated ${t.getHours()}:${String(t.getMinutes()).padStart(2,"0")}:${String(t.getSeconds()).padStart(2,"0")}`;
+  } catch(e) {
+    document.getElementById("statusText").innerHTML = '<span style="color:#c0392b">Could not load — check webhook URL and Apps Script deployment</span>';
+  }
+
+  countdownSecs = CONFIG.REFRESH_SECS;
+  countdownTimer = setInterval(() => {
+    countdownSecs--;
+    document.getElementById("countdown").textContent = `· refreshing in ${countdownSecs}s`;
+    if (countdownSecs <= 0) clearInterval(countdownTimer);
+  }, 1000);
+  refreshTimer = setTimeout(fetchData, CONFIG.REFRESH_SECS * 1000);
+}
+
+function render() {
+  const data = allData;
+  if (!data.length) return;
+
+  // ── parse numerics ──
+  const rows = data.map(r => ({
+    ...r,
+    bi:   parseFloat(r.biotic_index),
+    dS:   parseFloat(r.simpsons_stream),
+    dM:   parseFloat(r.simpsons_meadow),
+    alt:  parseFloat(r.alt_m),
+    lux:  parseFloat(r.lux),
+    ph:   parseFloat(r.ph_mean),
+    temp: parseFloat(r.temp_mean),
+    nit:  parseFloat(r.nitrate_mean),
+    site: parseInt(r.site),
+    grp:  parseInt(r.group),
+  }));
+
+  // ── stat cards ──
+  const validBI = rows.filter(r=>!isNaN(r.bi));
+  const avgBI   = validBI.length ? validBI.reduce((a,r)=>a+r.bi,0)/validBI.length : null;
+  const validD  = rows.filter(r=>!isNaN(r.dS));
+  const avgD    = validD.length ? validD.reduce((a,r)=>a+r.dS,0)/validD.length : null;
+  const sites   = new Set(rows.map(r=>r.site).filter(s=>!isNaN(s)));
+
+  document.getElementById("cGroups").textContent = rows.length;
+  document.getElementById("cGroupsSub").textContent = `of ${CONFIG.SITE_COUNT} groups`;
+  document.getElementById("cBI").textContent = fmt(avgBI,1);
+  if (avgBI !== null) {
+    const q = qualColor(avgBI);
+    document.getElementById("cBI").style.color = q.fg;
+  }
+  document.getElementById("cBISub").textContent = avgBI>10?"clean stream":avgBI>=3?"some pollution":"gross pollution";
+  document.getElementById("cSD").textContent = fmt(avgD,3);
+  document.getElementById("cSites").textContent = sites.size;
+  document.getElementById("cSitesSub").textContent = `of ${CONFIG.SITE_COUNT} sites`;
+
+  // badge
+  if (avgBI !== null) {
+    const q = qualColor(avgBI);
+    const badge = document.getElementById("hBadge");
+    badge.style.display = "block";
+    badge.style.background = q.bg;
+    badge.style.color = q.fg;
+    badge.textContent = `Avg BI ${fmt(avgBI,1)}`;
+  }
+
+  renderBIChart(rows);
+  renderSiteGrid(rows);
+  renderFlowCompare(rows);
+  renderSimpsonChart(rows);
+  renderAltChart(rows);
+  renderTable(rows);
+}
+
+function renderBIChart(rows) {
+  const el = document.getElementById("biChart");
+  if (!rows.length) { el.innerHTML = '<div class="empty">No data yet</div>'; return; }
+
+  // group by site, take last submission per site
+  const bySite = {};
+  rows.forEach(r => { if (!isNaN(r.site) && !isNaN(r.bi)) bySite[r.site] = r; });
+  const maxBI = 20;
+
+  let html = `<div class="bar-wrap">`;
+  html += `<div class="bar-axis"></div>`;
+  html += `<div class="bar-ref" style="bottom:${20 + (10/maxBI)*100}px"><span class="bar-ref-lbl">BI 10</span></div>`;
+  html += `<div class="bar-ref" style="bottom:${20 + (3/maxBI)*100}px"><span class="bar-ref-lbl" style="color:#E4A000">BI 3</span></div>`;
+
+  for (let s = 1; s <= CONFIG.SITE_COUNT; s++) {
+    const r = bySite[s];
+    if (r) {
+      const q = qualColor(r.bi);
+      const h = Math.min((r.bi / maxBI) * 100, 100);
+      html += `<div class="bar-col">
+        <div class="bar" style="height:${h}%;background:${q.bg};border:0.5px solid ${q.fg}40;">
+          <span class="bar-val" style="color:${q.fg}">${fmt(r.bi,1)}</span>
+        </div>
+        <div class="bar-lbl">S${s}</div>
+      </div>`;
+    } else {
+      html += `<div class="bar-col">
+        <div class="bar" style="height:3px;background:#eee;"></div>
+        <div class="bar-lbl" style="color:#ddd">S${s}</div>
+      </div>`;
+    }
+  }
+  html += `</div>`;
+  el.innerHTML = html;
+}
+
+function renderSiteGrid(rows) {
+  const el = document.getElementById("siteGrid");
+  const bySite = {};
+  rows.forEach(r => { if (!isNaN(r.site)) bySite[r.site] = r; });
+
+  let html = "";
+  for (let s = 1; s <= CONFIG.SITE_COUNT; s++) {
+    const r = bySite[s];
+    if (r) {
+      const q = qualColor(r.bi);
+      html += `<div class="site-tile" style="background:${q.bg};border-color:${q.fg}30">
+        <div class="site-num">Site ${s}</div>
+        <div class="site-bi" style="color:${q.fg}">${fmt(r.bi,1)}</div>
+        <div class="site-flow" style="color:${q.fg}99">${r.flow||""}</div>
+        <div class="site-group">Grp ${r.grp||r.group}</div>
+      </div>`;
+    } else {
+      html += `<div class="site-tile site-empty">
+        <div class="site-num">Site ${s}</div>
+        <div class="site-bi">—</div>
+      </div>`;
+    }
+  }
+  el.innerHTML = html;
+}
+
+function renderFlowCompare(rows) {
+  const el = document.getElementById("flowCompare");
+  const riffles = rows.filter(r=>r.flow==="riffle"&&!isNaN(r.bi));
+  const pools   = rows.filter(r=>r.flow==="pool"  &&!isNaN(r.bi));
+  if (!riffles.length && !pools.length) { el.innerHTML='<div class="empty">Not enough data yet</div>'; return; }
+
+  const avgR = riffles.length ? riffles.reduce((a,r)=>a+r.bi,0)/riffles.length : null;
+  const avgP = pools.length   ? pools.reduce((a,r)=>a+r.bi,0)/pools.length     : null;
+  const maxV = Math.max(avgR||0, avgP||0, 20);
+
+  const items = [
+    {label:`Riffles (n=${riffles.length})`, val:avgR, color:TEAL},
+    {label:`Pools (n=${pools.length})`,     val:avgP, color:"#378ADD"},
+  ];
+
+  let html = "";
+  items.forEach(({label,val,color})=>{
+    const pct = val ? Math.min((val/maxV)*100,100) : 0;
+    html += `<div class="compare-row">
+      <div class="compare-lbl">${label}</div>
+      <div class="compare-bar-wrap"><div class="compare-bar" style="width:${pct}%;background:${color}"></div></div>
+      <div class="compare-val" style="color:${color}">${val?fmt(val,1):"—"}</div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+function renderSimpsonChart(rows) {
+  const el = document.getElementById("simpsonChart");
+  const valid = rows.filter(r=>!isNaN(r.site)&&!isNaN(r.dS));
+  if (valid.length < 2) { el.innerHTML='<div class="empty">Need at least 2 sites</div>'; return; }
+
+  const bySite = {};
+  valid.forEach(r => { bySite[r.site] = r; });
+
+  let html = `<div class="bar-wrap">`;
+  for (let s = 1; s <= CONFIG.SITE_COUNT; s++) {
+    const r = bySite[s];
+    if (r) {
+      const h = r.dS * 100;
+      const col = r.dS > 0.7 ? TEAL : r.dS > 0.4 ? "#EF9F27" : "#E24B4A";
+      html += `<div class="bar-col">
+        <div class="bar" style="height:${h}%;background:${col}20;border:0.5px solid ${col}60;">
+          <span class="bar-val" style="color:${col}">${fmt(r.dS,2)}</span>
+        </div>
+        <div class="bar-lbl">S${s}</div>
+      </div>`;
+    } else {
+      html += `<div class="bar-col"><div class="bar" style="height:3px;background:#eee"></div><div class="bar-lbl" style="color:#ddd">S${s}</div></div>`;
+    }
+  }
+  html += `</div>`;
+  el.innerHTML = html;
+}
+
+function renderAltChart(rows) {
+  const el = document.getElementById("altChart");
+  const valid = rows.filter(r=>!isNaN(r.alt)&&!isNaN(r.bi));
+  if (valid.length < 3) { el.innerHTML='<div class="empty">Need at least 3 sites with GPS altitude captured</div>'; return; }
+
+  // simple scatter as inline SVG
+  const W=500, H=140, PAD={t:20,r:20,b:30,l:40};
+  const minAlt=Math.min(...valid.map(r=>r.alt));
+  const maxAlt=Math.max(...valid.map(r=>r.alt));
+  const minBI=0, maxBI=20;
+  const cx=r=>PAD.l+(r.alt-minAlt)/(maxAlt-minAlt+1)*(W-PAD.l-PAD.r);
+  const cy=r=>PAD.t+(1-(r.bi-minBI)/(maxBI-minBI))*(H-PAD.t-PAD.b);
+
+  let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;overflow:visible">`;
+  svg+=`<line x1="${PAD.l}" y1="${PAD.t}" x2="${PAD.l}" y2="${H-PAD.b}" stroke="#eee"/>`;
+  svg+=`<line x1="${PAD.l}" y1="${H-PAD.b}" x2="${W-PAD.r}" y2="${H-PAD.b}" stroke="#eee"/>`;
+  svg+=`<text x="${PAD.l-4}" y="${H-PAD.b}" font-size="9" fill="#aaa" text-anchor="end">0</text>`;
+  svg+=`<text x="${PAD.l-4}" y="${PAD.t+(1-10/20)*(H-PAD.t-PAD.b)}" font-size="9" fill="#aaa" text-anchor="end">10</text>`;
+  svg+=`<line x1="${PAD.l}" y1="${PAD.t+(1-10/20)*(H-PAD.t-PAD.b)}" x2="${W-PAD.r}" y2="${PAD.t+(1-10/20)*(H-PAD.t-PAD.b)}" stroke="#eee" stroke-dasharray="3,3"/>`;
+  svg+=`<text x="${PAD.l}" y="${H-PAD.b+10}" font-size="8" fill="#aaa">${Math.round(minAlt)}m</text>`;
+  svg+=`<text x="${W-PAD.r}" y="${H-PAD.b+10}" font-size="8" fill="#aaa" text-anchor="end">${Math.round(maxAlt)}m</text>`;
+  svg+=`<text x="10" y="${H/2}" font-size="8" fill="#aaa" transform="rotate(-90,10,${H/2})" text-anchor="middle">Biotic index</text>`;
+
+  valid.forEach(r=>{
+    const q=qualColor(r.bi);
+    svg+=`<circle cx="${cx(r)}" cy="${cy(r)}" r="5" fill="${q.bg}" stroke="${q.fg}" stroke-width="1"/>`;
+    svg+=`<text x="${cx(r)}" y="${cy(r)-8}" font-size="8" fill="#888" text-anchor="middle">S${r.site}</text>`;
+  });
+  svg+="</svg>";
+  el.innerHTML = svg;
+}
+
+function renderTable(rows) {
+  const tbody = document.getElementById("tableBody");
+  if (!rows.length) { tbody.innerHTML='<tr><td colspan="11" style="text-align:center;color:#aaa;padding:30px">No data yet</td></tr>'; return; }
+
+  const sorted = [...rows].sort((a,b)=>(parseInt(a.site)||99)-(parseInt(b.site)||99));
+  tbody.innerHTML = sorted.map(r=>{
+    const q = qualColor(r.bi);
+    const t = r.timestamp ? new Date(r.timestamp) : null;
+    const time = t ? `${t.getHours()}:${String(t.getMinutes()).padStart(2,"0")}` : "—";
+    return `<tr>
+      <td style="font-weight:500">${r.group||"—"}</td>
+      <td>${r.site||"—"}</td>
+      <td><span class="flow-tag">${r.flow||"—"}</span></td>
+      <td><span class="bi-pill" style="background:${q.bg};color:${q.fg}">${fmt(r.bi,1)}</span></td>
+      <td>${fmt(r.dS,3)}</td>
+      <td>${isNaN(r.alt)?"—":Math.round(r.alt)}</td>
+      <td>${isNaN(r.lux)?"—":Math.round(r.lux)}</td>
+      <td>${isNaN(r.ph)?"—":fmt(r.ph,1)}</td>
+      <td>${isNaN(r.temp)?"—":fmt(r.temp,1)}</td>
+      <td>${isNaN(r.nit)?"—":fmt(r.nit,1)}</td>
+      <td style="color:#aaa">${time}</td>
+    </tr>`;
+  }).join("");
+}
+
+function showTab(name) {
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById(`page-${name}`).classList.add("active");
+  event.target.classList.add("active");
+}
+
+// kick off
+fetchData();
+</script>
+</body>
+</html>

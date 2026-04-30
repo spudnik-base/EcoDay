@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Leysin Stream Survey</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; background: #f0f0ee; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #111; }
+  #root { max-width: 460px; margin: 0 auto; padding: 12px 12px 60px; }
+  input[type=number], input[type=url] {
+    display: block; width: 100%; height: 40px; padding: 0 10px;
+    border: 0.5px solid #ccc; border-radius: 8px;
+    font-size: 14px; font-family: inherit; background: #fafafa; color: #111; outline: none;
+  }
+  input[type=number]:focus, input[type=url]:focus { border-color: #1D9E75; background: #fff; }
+  input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  input[type=number] { -moz-appearance: textfield; }
+  button { font-family: inherit; cursor: pointer; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef}=React;
+const NAVY="#0B1C35",SNOW="#E8EDF5",TEAL="#1D9E75",TEAL_L="#E1F5EE",TEAL_D="#085041",TEAL_M="#5DCAA5";
+const GREEN="#4B7A1E",GREEN_L="#EAF3DE",GREEN_D="#27500A";
+const CARD={background:"#fff",border:"0.5px solid #ddd",borderRadius:12,padding:"12px 14px",marginBottom:8};
+const LBL={fontSize:11,color:"#888",marginBottom:4,display:"block"};
+const STAT={background:"#f5f5f3",borderRadius:8,padding:"10px 12px"};
+const SPECIES=[
+  {id:"stonefly",  name:"Stonefly nymph",       tol:10},
+  {id:"mayfly",    name:"Mayfly nymph",          tol:10},
+  {id:"uncased",   name:"Uncased caddisfly",     tol:10},
+  {id:"cased",     name:"Cased caddisfly",       tol:10},
+  {id:"riffle",    name:"Riffle beetle",         tol:10},
+  {id:"waterpenny",name:"Water penny",           tol:10},
+  {id:"flatworm",  name:"Flat worm",             tol:8},
+  {id:"damsel",    name:"Damselfly nymph",       tol:8},
+  {id:"blackfly",  name:"Fly / black fly larvae",tol:8},
+  {id:"beetle",    name:"Beetle larvae",         tol:6},
+  {id:"snail",     name:"Snail",                 tol:6},
+  {id:"shrimp",    name:"Shrimp / scud",         tol:6},
+  {id:"leech",     name:"Leech",                 tol:3},
+  {id:"segworm",   name:"Segmented worm",        tol:2},
+];
+const ABIOTIC=[
+  {key:"velocity",label:"Velocity",unit:"m/s"},
+  {key:"width",   label:"Width",   unit:"cm"},
+  {key:"depth",   label:"Depth",   unit:"cm"},
+  {key:"ph",      label:"pH",      unit:""},
+  {key:"temp",    label:"Temp",    unit:"°C"},
+  {key:"nitrate", label:"Nitrate", unit:"ppm"},
+];
+const ML="ABCDEFGHIJKLMNOP".split("");
+const SK="leysin_v5";
+const mu=vs=>{const n=vs.map(Number).filter((x,i)=>String(vs[i])!==""&&!isNaN(x));return n.length?n.reduce((a,b)=>a+b,0)/n.length:null;};
+const sg=vs=>{const n=vs.map(Number).filter((x,i)=>String(vs[i])!==""&&!isNaN(x));if(n.length<2)return null;const m=n.reduce((a,b)=>a+b,0)/n.length;return Math.sqrt(n.reduce((a,b)=>a+(b-m)**2,0)/(n.length-1));};
+const fmt=(v,d=2)=>v!=null?Number(v).toFixed(d):"—";
+const biCalc=cs=>{let s=0,N=0;cs.forEach(({n,t})=>{const c=parseInt(n)||0;s+=c*t;N+=c;});return N?s/N:null;};
+const simpD=vs=>{const ns=vs.map(v=>parseFloat(v)||0).filter(n=>n>0);const N=ns.reduce((a,b)=>a+b,0);if(N<=1||ns.length<2)return null;return 1-ns.reduce((a,n)=>a+n*(n-1),0)/(N*(N-1));};
+const qualOf=idx=>{
+  if(idx===null)return null;
+  if(idx>10)return{txt:"Good — clean stream",bg:"#EAF3DE",fg:"#27500A"};
+  if(idx>=3)return{txt:"Average — some pollution",bg:"#FFF3CD",fg:"#6B4C00"};
+  return{txt:"Poor — gross pollution",bg:"#FCEBEB",fg:"#791F1F"};
+};
+const tolOf=t=>t>=10?{bg:TEAL_L,fg:TEAL_D}:t>=8?{bg:"#E6F1FB",fg:"#0C447C"}:t>=6?{bg:"#FAEEDA",fg:"#633806"}:{bg:"#FCEBEB",fg:"#791F1F"};
+const INIT=()=>({
+  group:"",site:"",flow:"riffle",
+  gps:{lat:null,lng:null,alt:null,lux:null,gpsStatus:"idle",luxStatus:"idle"},
+  ab:Object.fromEntries(ABIOTIC.map(f=>[f.key,["","",""]])),
+  bio:Object.fromEntries(SPECIES.map(s=>[s.id,0])),
+  mdw:{site:"marsh",cover:Object.fromEntries(ML.map(l=>[l,""]))},
+  wh:"https://script.google.com/macros/s/AKfycbyf8etVUXXtA5XNlfZ4KGCkDpCxN15hdCTeWt1HcElTS2RXMEv1DG3RqdLFU0CYjRyqFA/exec",
+});
+const Mountains=()=>(
+  <svg viewBox="0 0 380 72" style={{width:"100%",display:"block",marginBottom:-2}} preserveAspectRatio="none">
+    <path d="M0,72 L0,62 C8,60 18,56 26,52 C32,48 38,44 44,40 C48,36 52,32 57,30 C60,28 63,30 66,33 C69,37 71,42 74,47 C77,43 82,39 88,37 C92,34 96,34 100,36 C103,38 105,41 108,44 C111,41 114,38 118,37 C121,36 124,37 127,39 C130,42 132,46 135,51 C138,54 141,57 145,59 C149,57 153,55 157,54 C161,53 165,53 169,54 C172,53 175,51 179,51 C183,50 186,48 190,46 C194,44 198,42 202,42 C205,40 209,37 214,33 C217,30 221,28 225,28 C228,27 231,28 234,30 C237,33 239,37 242,40 C245,36 249,32 254,28 C258,24 262,22 267,21 C271,20 275,21 279,23 C282,26 284,30 287,32 C290,28 294,24 299,20 C303,17 307,15 311,15 C315,15 319,17 323,20 C326,16 330,12 335,9 C339,6 343,5 347,5 C351,5 355,7 359,11 C362,15 365,21 368,27 C371,35 375,46 380,58 L380,72 Z"
+      fill={SNOW} opacity="0.12"/>
+    <path d="M0,72 L0,65 C10,63 21,59 30,55 C37,52 43,48 49,44 C53,41 57,37 62,34 C65,32 68,33 71,36 C74,40 76,45 79,49 C82,45 87,41 93,39 C97,37 101,37 105,39 C108,41 110,44 113,47 C116,44 119,41 123,40 C126,39 129,40 132,42 C135,45 137,49 140,54 C143,57 146,60 150,62 C154,60 158,58 162,57 C166,56 170,56 174,57 C177,56 180,54 184,54 C188,53 191,51 195,49 C199,47 203,45 207,45 C210,43 214,40 219,36 C222,33 226,31 230,31 C233,30 236,31 239,33 C242,36 244,40 247,43 C250,39 254,35 259,31 C263,27 267,25 272,24 C276,23 280,24 284,26 C287,29 289,33 292,35 C295,31 299,27 304,23 C308,20 312,18 316,18 C320,18 324,20 328,23 C331,19 335,15 340,12 C344,9 348,8 352,8 C356,8 360,10 364,14 C367,18 370,24 373,31 L380,50 L380,72 Z"
+      fill={SNOW} opacity="0.3"/>
+    <path d="M0,72 L0,68 C13,66 25,62 35,58 C42,55 49,51 55,47 C59,44 63,40 68,37 C71,35 74,36 77,39 C80,43 82,48 85,52 C88,48 93,44 99,42 C103,40 107,40 111,42 C114,44 116,47 119,50 C122,47 125,44 129,43 C132,42 135,43 138,45 C141,48 143,52 146,57 C149,60 152,63 156,65 C160,63 164,61 168,60 C172,59 176,59 180,60 C183,59 186,57 190,57 C194,56 197,54 201,52 C205,50 209,48 213,48 C216,46 220,43 225,39 C228,36 232,34 236,34 C239,33 242,34 245,36 C248,39 250,43 253,46 C256,42 260,38 265,34 C269,30 273,28 278,27 C282,26 286,27 290,29 C293,32 295,36 298,38 C301,34 305,30 310,26 C314,23 318,21 322,21 C326,21 330,23 334,26 C337,22 341,18 346,15 C350,12 354,11 358,11 C362,11 366,13 370,17 C373,22 376,29 379,40 L380,46 L380,72 Z"
+      fill={SNOW} opacity="0.65"/>
+    <path d="M0,72 L0,70 C15,68 28,64 38,60 C45,57 52,53 58,49 C62,46 66,42 71,39 C74,37 77,38 80,41 C83,45 85,50 88,54 C91,50 96,46 102,44 C106,42 110,42 114,44 C117,46 119,49 122,52 C125,49 128,46 132,45 C135,44 138,45 141,47 C144,50 146,54 149,59 C152,62 155,65 159,67 C163,65 167,63 171,62 C175,61 179,61 183,62 C186,61 189,59 193,59 C197,58 200,56 204,54 C208,52 212,50 216,50 C219,48 223,45 228,41 C231,38 235,36 239,36 C242,35 245,36 248,38 C251,41 253,45 256,48 C259,44 263,40 268,36 C272,32 276,30 281,29 C285,28 289,29 293,31 C296,34 298,38 301,40 C304,36 308,32 313,28 C317,25 321,23 325,23 C329,23 333,25 337,28 C340,24 344,20 349,17 C353,14 357,13 361,13 C365,13 369,15 373,19 C376,24 378,32 380,44 L380,72 Z"
+      fill={SNOW} opacity="1"/>
+  </svg>
+);
+
+function App(){
+  const [tab,setTab]=useState(0);
+  const [st,setSt]=useState(INIT());
+  const [sub,setSub]=useState("idle");
+  const [showWH,setShowWH]=useState(false);
+  const lightRef=useRef(null);
+  useEffect(()=>{
+    try{const r=localStorage.getItem(SK);if(r)setSt(JSON.parse(r));}catch{}
+    return()=>{if(lightRef.current)try{lightRef.current.stop();}catch{}};
+  },[]);
+  const save=n=>{try{localStorage.setItem(SK,JSON.stringify(n));}catch{}};
+  const upd=p=>setSt(prev=>{const n={...prev,...p};save(n);return n;});
+  const updG=p=>setSt(prev=>{const n={...prev,gps:{...prev.gps,...p}};save(n);return n;});
+  const capLoc=()=>{
+    updG({gpsStatus:"loading"});
+    navigator.geolocation.getCurrentPosition(
+      p=>updG({lat:p.coords.latitude.toFixed(6),lng:p.coords.longitude.toFixed(6),alt:p.coords.altitude?p.coords.altitude.toFixed(0):null,gpsStatus:"ok"}),
+      ()=>updG({gpsStatus:"error"}),{enableHighAccuracy:true,timeout:12000}
+    );
+  };
+  const capLux=()=>{
+    if(!("AmbientLightSensor" in window)){updG({luxStatus:"unsupported"});return;}
+    updG({luxStatus:"loading"});
+    try{
+      const s=new window.AmbientLightSensor();lightRef.current=s;
+      s.addEventListener("reading",()=>{updG({lux:Math.round(s.illuminance),luxStatus:"ok"});s.stop();});
+      s.addEventListener("error",()=>updG({luxStatus:"error"}));
+      s.start();
+    }catch{updG({luxStatus:"error"});}
+  };
+  const setAb=(k,i,v)=>{const a=[...st.ab[k]];a[i]=v;upd({ab:{...st.ab,[k]:a}});};
+  const stepB=(id,d)=>upd({bio:{...st.bio,[id]:Math.max(0,(st.bio[id]||0)+d)}});
+  const setMC=(l,v)=>upd({mdw:{...st.mdw,cover:{...st.mdw.cover,[l]:v}}});
+  const bi=biCalc(SPECIES.map(s=>({n:st.bio[s.id],t:s.tol})));
+  const dS=simpD(SPECIES.map(s=>st.bio[s.id]));
+  const dM=simpD(ML.map(l=>st.mdw.cover[l]));
+  const qual=qualOf(bi);
+  const exportCSV=()=>{
+    const rows=[["Field","Value"]];
+    rows.push(["Group",st.group],["Site",st.site],["Flow",st.flow],["GPS_lat",st.gps.lat||""],["GPS_lng",st.gps.lng||""],["Altitude_m",st.gps.alt||""],["Lux",st.gps.lux||""]);
+    ABIOTIC.forEach(f=>{st.ab[f.key].forEach((v,i)=>rows.push([`${f.key}_${i+1}`,v]));rows.push([`${f.key}_mean`,fmt(mu(st.ab[f.key]))],[`${f.key}_sd`,fmt(sg(st.ab[f.key]))]);});
+    SPECIES.forEach(s=>rows.push([s.name,st.bio[s.id]||0]));
+    rows.push(["Biotic_index",fmt(bi)],["Simpsons_D_stream",fmt(dS,3)],["Meadow_site",st.mdw.site],["Simpsons_D_meadow",fmt(dM,3)]);
+    ML.forEach(l=>rows.push([`sp_${l}`,st.mdw.cover[l]||0]));
+    const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([rows.map(r=>r.join(",")).join("\n")],{type:"text/csv"}));a.download=`leysin_g${st.group}_s${st.site}.csv`;a.click();
+  };
+  const submit=async()=>{
+    if(!st.wh)return;setSub("loading");
+    try{
+      await fetch(st.wh,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({group:st.group,site:st.site,flow:st.flow,timestamp:new Date().toISOString(),lat:st.gps.lat,lng:st.gps.lng,alt_m:st.gps.alt,lux:st.gps.lux,...Object.fromEntries(ABIOTIC.map(f=>[f.key+"_mean",fmt(mu(st.ab[f.key]))])),biotic_index:fmt(bi),simpsons_stream:fmt(dS,3),meadow_site:st.mdw.site,simpsons_meadow:fmt(dM,3),...Object.fromEntries(SPECIES.map(s=>[s.id,st.bio[s.id]||0])),...Object.fromEntries(ML.map(l=>[`sp_${l}`,st.mdw.cover[l]||0]))})});
+      setSub("ok");
+    }catch{setSub("error");}
+  };
+  const reset=()=>{const f=INIT();f.wh=st.wh;setSt(f);save(f);setTab(0);};
+
+  const NumGrid=({vals,current,setter})=>(
+    <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:4}}>
+      {vals.map(n=>(
+        <button key={n} onClick={()=>setter(String(n))} style={{width:40,height:40,borderRadius:8,fontSize:14,fontWeight:500,background:current===String(n)?NAVY:"#f5f5f3",color:current===String(n)?"#fff":"#555",border:`0.5px solid ${current===String(n)?NAVY:"#ccc"}`}}>{n}</button>
+      ))}
+    </div>
+  );
+  const SensorBtn=({label,value,unit,status,onTap})=>(
+    <div style={{display:"flex",alignItems:"center",padding:"10px 0",borderBottom:"0.5px solid #eee"}}>
+      <div style={{flex:1}}>
+        <div style={{fontSize:11,color:"#999"}}>{label}</div>
+        <div style={{fontSize:14,fontWeight:500,color:status==="ok"?TEAL_D:"#666",marginTop:2}}>{status==="ok"&&value!=null?`${value}${unit}`:status==="loading"?"reading…":status==="error"?"unavailable":status==="unsupported"?"not on this device":"—"}</div>
+      </div>
+      <button onClick={onTap} style={{fontSize:11,padding:"7px 14px",borderRadius:8,border:`0.5px solid ${status==="ok"?TEAL_M:"#ccc"}`,background:status==="ok"?TEAL_L:"#fafafa",color:status==="ok"?TEAL_D:"#555"}}>{status==="ok"?"re-read":"capture"}</button>
+    </div>
+  );
+  const Stepper=({id})=>{
+    const c=st.bio[id]||0,active=c>0;
+    return(
+      <div style={{display:"flex",alignItems:"center",flexShrink:0}}>
+        <button onClick={()=>stepB(id,-1)} style={{width:38,height:38,border:"0.5px solid #ccc",borderRight:"none",borderRadius:"8px 0 0 8px",background:"#f5f5f3",fontSize:22,color:"#666",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>−</button>
+        <div style={{width:42,height:38,border:`0.5px solid ${active?TEAL_M:"#ccc"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:active?500:400,color:active?TEAL_D:"#bbb",background:active?TEAL_L:"#fff"}}>{c}</div>
+        <button onClick={()=>stepB(id,1)} style={{width:38,height:38,border:"0.5px solid #ccc",borderLeft:"none",borderRadius:"0 8px 8px 0",background:active?TEAL_L:"#f5f5f3",fontSize:22,color:active?TEAL_D:TEAL,display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>+</button>
+      </div>
+    );
+  };
+
+  const TABS=["Site","Abiotic","Biotic","Meadow","Results"];
+  const pages=[
+    <div key="s" style={{paddingBottom:80}}>
+      <div style={CARD}><span style={LBL}>Group</span><NumGrid vals={[1,2,3,4,5,6,7,8,9,10]} current={st.group} setter={v=>upd({group:v})}/></div>
+      <div style={CARD}><span style={LBL}>Stream site</span><NumGrid vals={[1,2,3,4,5,6,7,8,9,10]} current={st.site} setter={v=>upd({site:v})}/></div>
+      <div style={CARD}>
+        <span style={LBL}>Flow type</span>
+        <div style={{display:"flex",gap:8,marginTop:4}}>
+          {["riffle","pool"].map(t=>(
+            <button key={t} onClick={()=>upd({flow:t})} style={{flex:1,padding:"11px 0",borderRadius:8,background:st.flow===t?NAVY:"#fafafa",color:st.flow===t?"#fff":"#555",border:`0.5px solid ${st.flow===t?NAVY:"#ccc"}`,fontSize:14,fontWeight:500,textTransform:"capitalize"}}>{t}</button>
+          ))}
+        </div>
+      </div>
+      <div style={CARD}>
+        <span style={{...LBL,marginBottom:0}}>Auto-captured sensors</span>
+        <SensorBtn label="Altitude (GPS)" value={st.gps.alt} unit=" m" status={st.gps.gpsStatus} onTap={capLoc}/>
+        <SensorBtn label="Ambient light" value={st.gps.lux} unit=" lux" status={st.gps.luxStatus} onTap={capLux}/>
+        {st.gps.gpsStatus==="ok"&&<div style={{fontSize:10,color:"#aaa",paddingTop:6}}>{st.gps.lat}, {st.gps.lng} — logged for ArcGIS</div>}
+      </div>
+      <div style={CARD}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer"}} onClick={()=>setShowWH(!showWH)}>
+          <span style={{fontSize:13,fontWeight:500,color:"#555"}}>Google Sheets webhook</span>
+          <span style={{fontSize:11,color:"#aaa"}}>{showWH?"▲":"▼"}</span>
+        </div>
+        {showWH&&<div style={{marginTop:10}} onClick={e=>e.stopPropagation()}>
+          <input type="url" placeholder="https://script.google.com/macros/s/…" value={st.wh} onChange={e=>upd({wh:e.target.value})} style={{marginTop:4}}/>
+          <div style={{fontSize:10,color:"#aaa",marginTop:6,lineHeight:1.5}}>Extensions → Apps Script → deploy as web app → paste URL here</div>
+        </div>}
+      </div>
+      <button onClick={reset} style={{width:"100%",padding:"11px 0",fontSize:13,color:"#c0392b",border:"0.5px solid #e0a0a0",borderRadius:8,background:"transparent"}}>Reset for new group</button>
+    </div>,
+
+    <div key="ab" style={{paddingBottom:80}}>
+      <div style={{fontSize:12,color:"#888",marginBottom:12,lineHeight:1.6}}>Three readings per factor. Mean (x̄) and standard deviation (±) calculated automatically.</div>
+      {ABIOTIC.map(f=>{const m=mu(st.ab[f.key]),s2=sg(st.ab[f.key]);return(
+        <div key={f.key} style={CARD}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+            <span style={{fontSize:14,fontWeight:500}}>{f.label}{f.unit?` (${f.unit})`:""}</span>
+            <div style={{display:"flex",gap:12,fontSize:12}}>
+              {m!==null&&<span style={{color:TEAL_D,fontWeight:500}}>x̄ {fmt(m)}</span>}
+              {s2!==null&&<span style={{color:"#aaa"}}>± {fmt(s2)}</span>}
+            </div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
+            {[0,1,2].map(i=><input key={i} type="number" step="0.01" placeholder={`#${i+1}`} value={st.ab[f.key][i]} onChange={e=>setAb(f.key,i,e.target.value)} style={{textAlign:"center"}}/>)}
+          </div>
+        </div>
+      );})}
+    </div>,
+
+    <div key="bi" style={{paddingBottom:80}}>
+      <div style={{fontSize:12,color:"#888",marginBottom:12,lineHeight:1.6}}>Tap + / − to count organisms from your kick sample.</div>
+      <div style={CARD}>
+        {SPECIES.map((sp,i)=>{const ts=tolOf(sp.tol);return(
+          <div key={sp.id} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:i<SPECIES.length-1?"0.5px solid #eee":"none"}}>
+            <div style={{flex:1}}>
+              <div style={{fontSize:14}}>{sp.name}</div>
+              <span style={{fontSize:10,padding:"2px 7px",borderRadius:20,background:ts.bg,color:ts.fg,marginTop:3,display:"inline-block"}}>tol {sp.tol}</span>
+            </div>
+            <Stepper id={sp.id}/>
+          </div>
+        );})}
+      </div>
+    </div>,
+
+    <div key="me" style={{paddingBottom:80}}>
+      <div style={{...CARD,marginBottom:10}}>
+        <span style={LBL}>Site type</span>
+        <div style={{display:"flex",gap:8,marginTop:4}}>
+          {[["marsh","Marsh (ungrazed)"],["drained","Drained (grazed)"]].map(([v,l])=>(
+            <button key={v} onClick={()=>upd({mdw:{...st.mdw,site:v}})} style={{flex:1,padding:"11px 0",borderRadius:8,background:st.mdw.site===v?GREEN_L:"#fafafa",color:st.mdw.site===v?GREEN_D:"#555",border:`0.5px solid ${st.mdw.site===v?GREEN:"#ccc"}`,fontSize:12,fontWeight:st.mdw.site===v?500:400}}>{l}</button>
+          ))}
+        </div>
+      </div>
+      <div style={{fontSize:12,color:"#888",marginBottom:8}}>% cover per species. Each quadrat square = 4%.</div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+        {ML.map(l=>{const v=st.mdw.cover[l],filled=v!==""&&v!=null;return(
+          <div key={l} style={{...CARD,marginBottom:0,display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:16,fontWeight:500,color:"#aaa",minWidth:16,textAlign:"center"}}>{l}</span>
+            <input type="number" min="0" max="100" step="4" placeholder="0%" value={v} onChange={e=>setMC(l,e.target.value)} style={{textAlign:"center",flex:1,background:filled?GREEN_L:"#fafafa",color:filled?GREEN_D:"#aaa",border:`0.5px solid ${filled?GREEN:"#ccc"}`}}/>
+          </div>
+        );})}
+      </div>
+    </div>,
+
+    <div key="re" style={{paddingBottom:80}}>
+      <div style={{...CARD,padding:"16px 14px"}}>
+        <span style={LBL}>Biotic index — site {st.site||"?"} ({st.flow})</span>
+        <div style={{fontSize:52,fontWeight:500,lineHeight:1,letterSpacing:-1}}>{fmt(bi)}</div>
+        {qual&&<div style={{display:"inline-block",marginTop:8,fontSize:12,padding:"4px 12px",borderRadius:20,background:qual.bg,color:qual.fg,fontWeight:500}}>{qual.txt}</div>}
+        <div style={{fontSize:10,color:"#aaa",marginTop:8}}>Σ(n × tolerance) ÷ N total organisms</div>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
+        <div style={STAT}><div style={LBL}>Simpson's D — stream</div><div style={{fontSize:28,fontWeight:500}}>{fmt(dS,3)}</div></div>
+        <div style={STAT}><div style={LBL}>Simpson's D — meadow</div><div style={{fontSize:28,fontWeight:500}}>{fmt(dM,3)}</div></div>
+      </div>
+      {(st.gps.alt||st.gps.lux)&&(
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
+          {st.gps.alt&&<div style={STAT}><div style={LBL}>Altitude</div><div style={{fontSize:24,fontWeight:500}}>{st.gps.alt} m</div></div>}
+          {st.gps.lux&&<div style={STAT}><div style={LBL}>Light</div><div style={{fontSize:24,fontWeight:500}}>{st.gps.lux} lux</div></div>}
+        </div>
+      )}
+      <div style={{...CARD,marginBottom:8}}>
+        <span style={LBL}>Abiotic summary</span>
+        <div style={{display:"grid",gridTemplateColumns:"auto 60px 60px",gap:"3px 10px",fontSize:12}}>
+          {["","mean","± SD"].map((h,i)=><div key={i} style={{fontSize:10,color:"#aaa",paddingBottom:4}}>{h}</div>)}
+          {ABIOTIC.map(f=>[
+            <div key={f.key+"l"} style={{color:"#666",padding:"4px 0",borderTop:"0.5px solid #eee"}}>{f.label}{f.unit?` (${f.unit})`:""}</div>,
+            <div key={f.key+"m"} style={{fontWeight:500,borderTop:"0.5px solid #eee",padding:"4px 0"}}>{fmt(mu(st.ab[f.key]))}</div>,
+            <div key={f.key+"s"} style={{color:"#aaa",borderTop:"0.5px solid #eee",padding:"4px 0"}}>{fmt(sg(st.ab[f.key]))}</div>,
+          ])}
+        </div>
+      </div>
+      {SPECIES.filter(s=>st.bio[s.id]>0).length>0&&(
+        <div style={{...CARD,marginBottom:8}}>
+          <span style={LBL}>Species found</span>
+          {SPECIES.filter(s=>st.bio[s.id]>0).map(s=>(
+            <div key={s.id} style={{display:"flex",justifyContent:"space-between",padding:"4px 0",borderBottom:"0.5px solid #eee",fontSize:13}}>
+              <span>{s.name}</span><span style={{fontWeight:500,color:TEAL_D}}>n = {s.bio}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      <button onClick={exportCSV} style={{width:"100%",marginBottom:8,padding:"12px 0",fontWeight:500,fontSize:14,border:"0.5px solid #ccc",borderRadius:8,background:"#fafafa"}}>Export CSV ↓</button>
+      {st.wh?(
+        <button onClick={submit} disabled={sub==="loading"} style={{width:"100%",padding:"12px 0",fontWeight:500,fontSize:14,borderRadius:8,border:`0.5px solid ${sub==="ok"?TEAL_M:sub==="error"?"#e0a0a0":"#ccc"}`,background:sub==="ok"?TEAL_L:sub==="error"?"#FCEBEB":"#fafafa",color:sub==="ok"?TEAL_D:sub==="error"?"#c0392b":"#111"}}>
+          {sub==="loading"?"Submitting…":sub==="ok"?"Submitted to Sheets ✓":sub==="error"?"Failed — try CSV":"Submit to Google Sheets →"}
+        </button>
+      ):(
+        <div style={{fontSize:12,color:"#aaa",textAlign:"center",padding:"8px 0"}}>Add webhook URL in Site tab to submit to Sheets</div>
+      )}
+    </div>,
+  ];
+
+  return(
+    <div style={{maxWidth:460,margin:"0 auto"}}>
+      <div style={{background:NAVY,borderRadius:"12px 12px 0 0",overflow:"hidden"}}>
+        <div style={{padding:"18px 18px 4px",position:"relative"}}>
+          <div style={{fontSize:11,color:"rgba(232,237,245,0.4)",letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:4}}>Leysin American School</div>
+          <div style={{fontSize:21,fontWeight:500,color:SNOW,letterSpacing:-0.3}}>Stream survey {new Date().getFullYear()}</div>
+          <div style={{fontSize:12,color:TEAL_M,marginTop:3}}>
+            {st.group?`Group ${st.group}`:"set group"}{st.site?` · Site ${st.site}`:""}{st.flow?` · ${st.flow}`:""}{st.gps.alt?` · ${st.gps.alt} m`:""}
+          </div>
+          {bi!==null&&<div style={{position:"absolute",top:18,right:18,fontSize:13,padding:"5px 12px",borderRadius:20,background:qual?.bg,color:qual?.fg,fontWeight:500}}>BI {fmt(bi,1)}</div>}
+        </div>
+        <Mountains/>
+        <div style={{display:"flex",borderTop:"0.5px solid rgba(255,255,255,0.08)"}}>
+          {TABS.map((t,i)=>(
+            <button key={i} onClick={()=>setTab(i)} style={{flex:1,padding:"10px 0",background:"transparent",border:"none",borderBottom:tab===i?`2px solid ${TEAL_M}`:"2px solid transparent",color:tab===i?SNOW:"rgba(232,237,245,0.35)",fontSize:10,fontWeight:tab===i?500:400,cursor:"pointer",letterSpacing:"0.02em"}}>{t}</button>
+          ))}
+        </div>
+      </div>
+      <div style={{background:"#fff",border:"0.5px solid #ddd",borderTop:"none",borderRadius:"0 0 12px 12px",padding:"14px 14px 0"}}>
+        {pages[tab]}
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
