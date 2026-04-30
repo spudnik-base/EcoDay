@@ -5,6 +5,7 @@ import Header from "@/components/shared/Header";
 import TabBar from "@/components/shared/TabBar";
 import StatusBar from "@/components/dashboard/StatusBar";
 import OverviewTab from "@/components/dashboard/OverviewTab";
+import SummaryTab from "@/components/dashboard/SummaryTab";
 import SitesTab from "@/components/dashboard/SitesTab";
 import CompareTab from "@/components/dashboard/CompareTab";
 import DataTable from "@/components/dashboard/DataTable";
@@ -13,7 +14,7 @@ import { fmt, qualityOf } from "@/lib/calculations";
 import { parseRow } from "@/lib/parseRow";
 import { useClassData } from "@/lib/useClassData";
 
-const TABS = ["Overview", "Sites", "Compare", "Data"] as const;
+const TABS = ["Overview", "Summary", "Sites", "Compare", "Data"] as const;
 
 export default function DashboardPage() {
   const [tab, setTab] = useState(0);
@@ -51,9 +52,10 @@ export default function DashboardPage() {
           onRefresh={refresh}
         />
         {tab === 0 && <OverviewTab rows={parsed} />}
-        {tab === 1 && <SitesTab rows={parsed} />}
-        {tab === 2 && <CompareTab rows={parsed} />}
-        {tab === 3 && <DataTable rows={parsed} />}
+        {tab === 1 && <SummaryTab rows={parsed} />}
+        {tab === 2 && <SitesTab rows={parsed} />}
+        {tab === 3 && <CompareTab rows={parsed} />}
+        {tab === 4 && <DataTable rows={parsed} />}
       </div>
     </main>
   );

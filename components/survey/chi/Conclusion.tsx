@@ -54,6 +54,10 @@ export default function Conclusion({
           What might explain the result for {speciesLabel} between {labelA} and {labelB}?
           Consider habitat preferences, water flow, oxygen, vegetation, grazing pressure.
         </p>
+        <p className="font-serif text-[14px] text-ink leading-relaxed mt-3">
+          Now try a different species. Does the conclusion hold, or does another
+          species behave the opposite way?
+        </p>
       </Card>
     </>
   );
