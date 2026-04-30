@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- maskable: ensure key content is in the central 80% safe zone -->
+  <rect width="512" height="512" fill="#F4EDDC"/>
+  <g transform="translate(51.2, 51.2) scale(0.8)">
+    <rect width="512" height="512" fill="#F4EDDC"/>
+    <polygon points="0,512 0,360 64,320 144,360 224,300 320,360 400,300 480,340 512,320 512,512" fill="#3F4A6A"/>
+    <polygon points="0,512 0,400 80,360 156,420 240,330 320,400 400,330 480,380 512,360 512,512" fill="#2A3556"/>
+    <polygon points="0,512 0,440 32,420 88,300 144,400 188,260 232,380 276,240 324,360 372,220 420,340 460,260 488,360 512,400 512,512" fill="#141E3A"/>
+  </g>
+</svg>
