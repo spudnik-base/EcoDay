@@ -37,7 +37,7 @@ export default function Field({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       className={[
-        "h-10 w-full px-2 text-center text-[14px] border-[0.5px] focus:border-ink",
+        "h-10 w-full px-2 text-center text-[14px] border focus:border-ink",
         filled ? tone : "border-rule text-ink",
         className
       ].join(" ")}

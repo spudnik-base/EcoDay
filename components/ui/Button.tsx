@@ -33,7 +33,7 @@ export default function Button({
       onClick={onClick}
       disabled={disabled}
       className={[
-        "w-full h-11 px-3 font-mono uppercase tracking-spec text-[11px] border-[0.5px] transition-colors disabled:opacity-50",
+        "w-full h-11 px-3 font-mono uppercase tracking-spec text-[11px] border transition-colors disabled:opacity-50",
         variants[variant],
         className
       ].join(" ")}

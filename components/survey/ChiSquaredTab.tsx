@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Card from "@/components/ui/Card";
 import HabitatPick from "./chi/HabitatPick";
 import SpeciesPick from "./chi/SpeciesPick";
@@ -16,6 +16,7 @@ export default function ChiSquaredTab() {
   const [habitat, setHabitat] = useState<Habitat>("stream");
   const [speciesId, setSpeciesId] = useState<string>("");
   const { rows, status, refresh } = useClassData(false);
+  const speciesPickRef = useRef<HTMLDivElement | null>(null);
 
   const speciesLabel =
     speciesOptions(habitat).find((o) => o.id === speciesId)?.label ?? "the species";
@@ -38,7 +39,7 @@ export default function ChiSquaredTab() {
           </span>
           <button
             onClick={refresh}
-            className="font-mono uppercase tracking-spec text-[10px] px-2 py-1 border-[0.5px] border-rule"
+            className="font-mono uppercase tracking-spec text-[10px] px-2 py-1 border border-rule"
             disabled={status === "loading"}
           >
             {status === "loading" ? "loading..." : "reload class data"}
@@ -47,7 +48,9 @@ export default function ChiSquaredTab() {
       </Card>
 
       <HabitatPick value={habitat} onChange={(h) => { setHabitat(h); setSpeciesId(""); }} />
-      <SpeciesPick habitat={habitat} value={speciesId} onChange={setSpeciesId} />
+      <div ref={speciesPickRef}>
+        <SpeciesPick habitat={habitat} value={speciesId} onChange={setSpeciesId} />
+      </div>
 
       {speciesId && (() => {
         const result = chiSquared(rows, { habitat, speciesId });
@@ -104,6 +107,15 @@ export default function ChiSquaredTab() {
               labelA={result.labelA}
               labelB={result.labelB}
             />
+            <button
+              onClick={() => {
+                setSpeciesId("");
+                speciesPickRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+              className="w-full h-11 px-3 mt-2 font-mono uppercase tracking-spec text-[11px] font-medium border border-ink bg-paper text-ink"
+            >
+              Try another species
+            </button>
           </>
         );
       })()}

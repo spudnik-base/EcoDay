@@ -19,7 +19,7 @@ export default function SpeciesPick({ habitat, value, onChange }: Props) {
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full h-11 px-2 font-mono text-[12px] bg-paper2/30 border-[0.5px] border-rule focus:border-ink appearance-none"
+          className="w-full h-11 px-2 font-mono text-[12px] bg-paper2/30 border border-rule focus:border-ink appearance-none"
         >
           <option value="">choose...</option>
           {options.map((o) => (

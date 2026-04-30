@@ -11,7 +11,7 @@ type Props = {
 export default function CoverInput({ letter, value, onChange }: Props) {
   const filled = value !== "" && value != null;
   return (
-    <div className="bg-paper border-[0.5px] border-rule px-3 py-2 flex items-center gap-2">
+    <div className="bg-paper border border-rule px-3 py-2 flex items-center gap-2">
       <span className="font-serif text-[18px] text-ink2 w-4 text-center">
         {letter}
       </span>

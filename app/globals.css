@@ -10,7 +10,9 @@
     background: #F4EDDC;
     color: #1C2A48;
     font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    font-weight: 450;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* Faint dot grid behind everything: 5mm-ish dots, very low contrast,
@@ -39,8 +41,9 @@
 @layer utilities {
   .font-serif-tnum { font-feature-settings: "tnum" 1; }
   .ink-stamp {
-    transform: rotate(-1.2deg);
-    box-shadow: 0 0 0 0.5px #1C2A48 inset, 1px 1px 0 #1C2A48;
+    transform: rotate(-0.6deg);
+    box-shadow: 0 0 0 1.5px #1C2A48 inset, 1px 1px 0 #1C2A48;
+    font-weight: 600;
   }
   /* dotted underline used for fill-in-the-blank inputs */
   .underline-dots {

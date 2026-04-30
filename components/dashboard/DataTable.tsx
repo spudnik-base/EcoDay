@@ -27,7 +27,7 @@ export default function DataTable({ rows }: Props) {
     (a, b) => (Number.isNaN(a.site) ? 99 : a.site) - (Number.isNaN(b.site) ? 99 : b.site)
   );
   return (
-    <section className="bg-paper border-[0.5px] border-rule p-4">
+    <section className="bg-paper border border-rule p-4">
       <SpecLabel>All submissions</SpecLabel>
       <div className="overflow-x-auto">
         <table className="w-full font-mono text-[12px] border-collapse">
