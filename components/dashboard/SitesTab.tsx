@@ -13,7 +13,7 @@ export default function SitesTab({ rows }: Props) {
   return (
     <section className="bg-paper border border-rule p-4">
       <SpecLabel>Site-by-site summary</SpecLabel>
-      <div className="grid grid-cols-5 gap-1.5">
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
         {Array.from({ length: CONFIG.SITE_COUNT }, (_, i) => i + 1).map((s) => (
           <SiteTile key={s} siteNumber={s} row={bySite[s]} />
         ))}
