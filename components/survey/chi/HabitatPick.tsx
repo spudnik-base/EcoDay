@@ -23,14 +23,31 @@ export default function HabitatPick({ value, onChange }: Props) {
               key={v}
               onClick={() => onChange(v)}
               className={[
-                "px-3 py-3 text-left border",
+                "px-3 py-3 text-left border-2 transition-colors",
                 active
-                  ? "border-ink bg-paper2/40"
+                  ? "border-ink bg-paper2"
                   : "border-rule bg-paper hover:border-ink"
               ].join(" ")}
             >
-              <div className="font-serif text-[16px] text-ink">{name}</div>
-              <div className="font-mono text-[10px] text-ink3 mt-0.5">{sub}</div>
+              <div className="flex items-center gap-2">
+                <span
+                  className={[
+                    "inline-block w-3 h-3 rounded-full border",
+                    active ? "border-ink bg-ink" : "border-rule bg-paper"
+                  ].join(" ")}
+                />
+                <span
+                  className={[
+                    "font-serif text-[16px]",
+                    active ? "text-ink font-medium" : "text-ink2"
+                  ].join(" ")}
+                >
+                  {name}
+                </span>
+              </div>
+              <div className="font-mono text-[10px] text-ink3 mt-1 ml-5">
+                {sub}
+              </div>
             </button>
           );
         })}

@@ -2,6 +2,7 @@
 
 import Card from "@/components/ui/Card";
 import SpeciesRow from "./biotic/SpeciesRow";
+import ToleranceExplainer from "./biotic/ToleranceExplainer";
 import { SPECIES } from "@/lib/constants";
 import type { UseSurveyState } from "@/lib/useSurveyState";
 
@@ -14,6 +15,7 @@ export default function BioticTab({ survey }: Props) {
       <p className="text-[11px] font-mono text-ink3 leading-relaxed mb-3">
         Tap + and &minus; to count organisms from your kick sample.
       </p>
+      <ToleranceExplainer />
       <Card>
         {SPECIES.map((sp, i) => (
           <SpeciesRow
