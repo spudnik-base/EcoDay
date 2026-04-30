@@ -11,7 +11,7 @@ export default function SitesTab({ rows }: Props) {
   const bySite: Record<number, ParsedRow> = {};
   for (const r of rows) if (!Number.isNaN(r.site)) bySite[r.site] = r;
   return (
-    <section className="bg-paper border-[0.5px] border-rule p-4">
+    <section className="bg-paper border border-rule p-4">
       <SpecLabel>Site-by-site summary</SpecLabel>
       <div className="grid grid-cols-5 gap-1.5">
         {Array.from({ length: CONFIG.SITE_COUNT }, (_, i) => i + 1).map((s) => (

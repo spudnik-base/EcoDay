@@ -7,7 +7,7 @@ type Props = {
 
 export default function StatCard({ label, value, sub, valueColor }: Props) {
   return (
-    <div className="bg-paper border-[0.5px] border-rule px-4 py-3.5">
+    <div className="bg-paper border border-rule px-4 py-3.5">
       <div className="text-[10px] font-mono uppercase tracking-spec text-ink3 mb-1">
         {label}
       </div>

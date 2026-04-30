@@ -42,7 +42,7 @@ export default function DashboardPage() {
         wide
       />
       <TabBar tabs={TABS} active={tab} onChange={setTab} />
-      <div className="bg-paper border-[0.5px] border-rule border-t-0 px-4 pt-2 pb-4">
+      <div className="bg-paper border border-rule border-t-0 px-4 pt-2 pb-4">
         <StatusBar
           count={parsed.length}
           status={status}

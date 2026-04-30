@@ -6,7 +6,7 @@ type Props = {
 
 export default function StatBox({ label, value, unit }: Props) {
   return (
-    <div className="bg-paper2/40 border-[0.5px] border-rule px-3 py-2.5">
+    <div className="bg-paper2/40 border border-rule px-3 py-2.5">
       <div className="text-[10px] font-mono uppercase tracking-spec text-ink3 mb-1">
         {label}
       </div>

@@ -54,7 +54,7 @@ export default function OverviewTab({ rows }: Props) {
           sub={`of ${CONFIG.SITE_COUNT} sites`}
         />
       </div>
-      <section className="bg-paper border-[0.5px] border-rule p-4">
+      <section className="bg-paper border border-rule p-4">
         <SpecLabel>Biotic index by site</SpecLabel>
         <BIChart rows={rows} />
       </section>

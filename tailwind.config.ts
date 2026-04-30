@@ -22,7 +22,8 @@ const config: Config = {
         teal2:    "#DEEAE3",
         amber1:   "#A47A1B",
         amber2:   "#F5EBC8",
-        rule:     "#C9BFA4"
+        rule:     "#8E7D54",
+        rule2:    "#6F5F37"
       },
       fontFamily: {
         serif: ["'EB Garamond'", "ui-serif", "Georgia", "serif"],

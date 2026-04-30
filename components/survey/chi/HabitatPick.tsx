@@ -23,7 +23,7 @@ export default function HabitatPick({ value, onChange }: Props) {
               key={v}
               onClick={() => onChange(v)}
               className={[
-                "px-3 py-3 text-left border-[0.5px]",
+                "px-3 py-3 text-left border",
                 active
                   ? "border-ink bg-paper2/40"
                   : "border-rule bg-paper hover:border-ink"

@@ -24,7 +24,7 @@ export default function WebhookPanel() {
           <div className="text-[10px] font-mono text-ink3 mb-1">
             Google Sheets webhook (set in code)
           </div>
-          <div className="text-[10px] font-mono text-ink2 break-all bg-paper2/40 p-2 border-[0.5px] border-rule">
+          <div className="text-[10px] font-mono text-ink2 break-all bg-paper2/40 p-2 border border-rule">
             {CONFIG.WEBHOOK_URL}
           </div>
           <div className="text-[10px] font-mono text-ink4 mt-1.5 leading-relaxed">

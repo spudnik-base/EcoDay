@@ -25,7 +25,7 @@ export default function MeadowSiteToggle({ value, onChange }: Props) {
               key={v}
               onClick={() => onChange(v)}
               className={[
-                "flex-1 h-11 px-2 font-mono text-[11px] uppercase tracking-spec border-[0.5px]",
+                "flex-1 h-11 px-2 font-mono text-[11px] uppercase tracking-spec border",
                 active
                   ? "bg-moss2 text-moss border-moss"
                   : "border-rule text-ink3 bg-paper2/30 hover:text-ink"

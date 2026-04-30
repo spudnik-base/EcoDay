@@ -45,7 +45,7 @@ export default function SurveyPage() {
         badge={badge}
       />
       <TabBar tabs={TABS} active={tab} onChange={setTab} />
-      <div className="bg-paper border-[0.5px] border-rule border-t-0 px-3.5 pt-3.5 pb-2">
+      <div className="bg-paper border border-rule border-t-0 px-3.5 pt-3.5 pb-2">
         {tab === 0 && <SiteTab survey={survey} />}
         {tab === 1 && <AbioticTab survey={survey} />}
         {tab === 2 && <BioticTab survey={survey} />}

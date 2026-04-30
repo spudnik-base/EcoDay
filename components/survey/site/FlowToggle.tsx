@@ -17,10 +17,10 @@ export default function FlowToggle({ value, onChange }: Props) {
               key={t}
               onClick={() => onChange(t)}
               className={[
-                "flex-1 h-11 font-mono uppercase tracking-spec text-[11px] border-[0.5px]",
+                "flex-1 h-11 font-mono uppercase tracking-spec text-[12px] border font-medium",
                 active
                   ? "ink-stamp bg-paper text-ink"
-                  : "border-rule text-ink3 bg-paper2/30 hover:text-ink"
+                  : "border-rule text-ink2 bg-paper hover:border-ink"
               ].join(" ")}
             >
               {t}

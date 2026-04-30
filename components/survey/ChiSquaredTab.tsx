@@ -38,7 +38,7 @@ export default function ChiSquaredTab() {
           </span>
           <button
             onClick={refresh}
-            className="font-mono uppercase tracking-spec text-[10px] px-2 py-1 border-[0.5px] border-rule"
+            className="font-mono uppercase tracking-spec text-[10px] px-2 py-1 border border-rule"
             disabled={status === "loading"}
           >
             {status === "loading" ? "loading..." : "reload class data"}

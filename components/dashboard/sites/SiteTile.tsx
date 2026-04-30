@@ -6,7 +6,7 @@ type Props = { siteNumber: number; row?: ParsedRow };
 export default function SiteTile({ siteNumber, row }: Props) {
   if (!row) {
     return (
-      <div className="border-[0.5px] border-rule bg-paper2/40 px-2 py-2.5 text-center">
+      <div className="border border-rule bg-paper2/40 px-2 py-2.5 text-center">
         <div className="font-mono text-[10px] text-ink4">Site {siteNumber}</div>
         <div className="font-serif text-[18px] text-ink4 mt-1 leading-none">·</div>
       </div>

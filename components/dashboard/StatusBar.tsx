@@ -46,7 +46,7 @@ export default function StatusBar({
       </div>
       <button
         onClick={onRefresh}
-        className="font-mono uppercase tracking-spec text-[10px] px-3 py-1.5 border-[0.5px] border-rule bg-paper hover:border-ink"
+        className="font-mono uppercase tracking-spec text-[10px] px-3 py-1.5 border border-rule bg-paper hover:border-ink"
       >
         Refresh
       </button>

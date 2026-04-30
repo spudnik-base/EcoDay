@@ -21,15 +21,15 @@ function statusText(status: SensorStatus, value: string | number | null, unit: s
 export default function SensorRow({ label, value, unit, status, onCapture }: Props) {
   const ok = status === "ok";
   return (
-    <div className="flex items-center py-2.5 border-b border-rule/60 last:border-b-0">
+    <div className="flex items-center py-2.5 border-b border-rule/70 last:border-b-0">
       <div className="flex-1">
-        <div className="text-[10px] font-mono uppercase tracking-spec text-ink3">
+        <div className="text-[11px] font-mono uppercase tracking-spec font-medium text-ink2">
           {label}
         </div>
         <div
           className={[
             "font-mono text-[14px] mt-0.5",
-            ok ? "text-teal" : "text-ink4"
+            ok ? "text-teal font-medium" : "text-ink3"
           ].join(" ")}
         >
           {statusText(status, value, unit)}
@@ -38,10 +38,10 @@ export default function SensorRow({ label, value, unit, status, onCapture }: Pro
       <button
         onClick={onCapture}
         className={[
-          "font-mono uppercase tracking-spec text-[10px] px-3 py-2 border-[0.5px]",
+          "font-mono uppercase tracking-spec text-[11px] font-medium px-3 py-2 border",
           ok
             ? "border-teal text-teal bg-teal2"
-            : "border-rule text-ink3 bg-paper2/30 hover:text-ink"
+            : "border-rule text-ink2 bg-paper hover:border-ink"
         ].join(" ")}
       >
         {ok ? "re-read" : "capture"}
