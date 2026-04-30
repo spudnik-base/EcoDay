@@ -41,13 +41,23 @@ export default function SummaryTab({ rows }: Props) {
   return (
     <div className="space-y-3">
       <section className="bg-paper border border-rule p-4">
-        <SpecLabel>Headline class averages</SpecLabel>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <StatPair label="Stream Simpson's D" stat={stream} decimals={3} />
+        <SpecLabel>Headline diversity</SpecLabel>
+        <StatPair label="Stream Simpson's D, class average" stat={stream} decimals={3} />
+      </section>
+
+      <section className="bg-paper border border-rule p-4">
+        <SpecLabel>Class abiotic averages</SpecLabel>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <StatPair label="Velocity" stat={ab.velocity} decimals={2} unit="m/s" />
+          <StatPair label="Width" stat={ab.width} decimals={1} unit="cm" />
+          <StatPair label="Depth" stat={ab.depth} decimals={1} unit="cm" />
           <StatPair label="pH" stat={ab.ph} decimals={2} />
           <StatPair label="Temperature" stat={ab.temp} decimals={1} unit="°C" />
           <StatPair label="Nitrate" stat={ab.nitrate} decimals={2} unit="ppm" />
         </div>
+        <p className="font-mono text-[10px] text-ink3 mt-3 leading-relaxed">
+          Each value: class mean of the per-group means, with 1 SD across submissions.
+        </p>
       </section>
 
       <section className="bg-paper border border-rule p-4">

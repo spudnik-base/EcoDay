@@ -48,8 +48,11 @@ export function biPerSite(rows: ParsedRow[], siteCount: number): MeanSd[] {
 
 export function abioticStats(rows: ParsedRow[]) {
   return {
-    ph:      meanSd(rows.map((r) => r.ph)),
-    temp:    meanSd(rows.map((r) => r.temp)),
-    nitrate: meanSd(rows.map((r) => r.nitrate))
+    velocity: meanSd(rows.map((r) => r.velocity)),
+    width:    meanSd(rows.map((r) => r.width)),
+    depth:    meanSd(rows.map((r) => r.depth)),
+    ph:       meanSd(rows.map((r) => r.ph)),
+    temp:     meanSd(rows.map((r) => r.temp)),
+    nitrate:  meanSd(rows.map((r) => r.nitrate))
   };
 }

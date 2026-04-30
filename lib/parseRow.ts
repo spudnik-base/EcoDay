@@ -12,6 +12,9 @@ export type ParsedRow = {
   ph: number;
   temp: number;
   nitrate: number;
+  velocity: number;
+  width: number;
+  depth: number;
   meadow_site: string;
   timestamp: string;
   raw: ClassRow;
@@ -35,6 +38,9 @@ export function parseRow(r: ClassRow): ParsedRow {
     ph:          num(r.ph_mean),
     temp:        num(r.temp_mean),
     nitrate:     num(r.nitrate_mean),
+    velocity:    num(r.velocity_mean),
+    width:       num(r.width_mean),
+    depth:       num(r.depth_mean),
     meadow_site: String(r.meadow_site ?? ""),
     timestamp:   String(r.timestamp ?? ""),
     raw:         r
