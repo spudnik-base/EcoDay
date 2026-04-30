@@ -12,34 +12,41 @@ type Props = {
 
 export default function SpeciesPick({ habitat, value, onChange }: Props) {
   const options = speciesOptions(habitat);
+  const cols = habitat === "meadow" ? "grid-cols-4" : "grid-cols-2";
   return (
     <Card>
       <SpecLabel>2. Pick a species</SpecLabel>
-      <div className="relative">
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full h-11 pl-3 pr-10 font-mono text-[12px] text-ink bg-paper border border-rule focus:border-ink appearance-none cursor-pointer"
-        >
-          <option value="">choose...</option>
-          {options.map((o) => (
-            <option key={o.id} value={o.id}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-        <span
-          aria-hidden
-          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink2 font-mono text-[14px]"
-        >
-          ▾
-        </span>
+      <p className="font-mono text-[10px] text-ink3 leading-relaxed mb-2">
+        Tap any species to switch. The working below updates straight away.
+      </p>
+      <div className={`grid ${cols} gap-1.5`}>
+        {options.map((o) => {
+          const active = value === o.id;
+          return (
+            <button
+              key={o.id}
+              onClick={() => onChange(o.id)}
+              className={[
+                "px-2 py-2 text-left border transition-colors",
+                active
+                  ? "border-ink border-2 bg-paper2 text-ink"
+                  : "border-rule bg-paper text-ink2 hover:border-ink"
+              ].join(" ")}
+            >
+              <span
+                className={[
+                  habitat === "meadow"
+                    ? "font-serif text-[16px] block text-center"
+                    : "font-serif text-[13px] leading-tight",
+                  active ? "font-medium" : ""
+                ].join(" ")}
+              >
+                {o.label}
+              </span>
+            </button>
+          );
+        })}
       </div>
-      {value && (
-        <p className="font-mono text-[10px] text-ink3 mt-2 leading-relaxed">
-          Tap the box above to change to another species. Working updates live.
-        </p>
-      )}
     </Card>
   );
 }
