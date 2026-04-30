@@ -8,11 +8,12 @@ import AbioticTab from "@/components/survey/AbioticTab";
 import BioticTab from "@/components/survey/BioticTab";
 import MeadowTab from "@/components/survey/MeadowTab";
 import ResultsTab from "@/components/survey/ResultsTab";
+import ChiSquaredTab from "@/components/survey/ChiSquaredTab";
 import { CONFIG } from "@/lib/config";
 import { bioticIndex, fmt, qualityOf } from "@/lib/calculations";
 import { useSurveyState } from "@/lib/useSurveyState";
 
-const TABS = ["Site", "Abiotic", "Biotic", "Meadow", "Results"] as const;
+const TABS = ["Site", "Abiotic", "Biotic", "Meadow", "Results", "Chi sq"] as const;
 
 export default function SurveyPage() {
   const [tab, setTab] = useState(0);
@@ -50,6 +51,7 @@ export default function SurveyPage() {
         {tab === 2 && <BioticTab survey={survey} />}
         {tab === 3 && <MeadowTab survey={survey} />}
         {tab === 4 && <ResultsTab survey={survey} />}
+        {tab === 5 && <ChiSquaredTab />}
       </div>
     </main>
   );
