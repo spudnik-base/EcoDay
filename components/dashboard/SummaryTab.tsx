@@ -9,21 +9,17 @@ import {
   abioticStats,
   biByFlow,
   biPerSite,
-  meadowDiversityByHabitat,
   streamDiversityStats
 } from "@/lib/aggregations";
 import type { ParsedRow } from "@/lib/parseRow";
 
 const TEAL = "#3F8A72";
 const POOL = "#3A6BB7";
-const MOSS = "#4B6A2C";
-const DRAINED = "#A47A1B";
 
 type Props = { rows: ParsedRow[] };
 
 export default function SummaryTab({ rows }: Props) {
   const stream = streamDiversityStats(rows);
-  const meadow = meadowDiversityByHabitat(rows);
   const flow = biByFlow(rows);
   const sitePerSite = biPerSite(rows, CONFIG.SITE_COUNT);
   const ab = abioticStats(rows);
@@ -57,23 +53,6 @@ export default function SummaryTab({ rows }: Props) {
         </div>
         <p className="font-mono text-[10px] text-ink3 mt-3 leading-relaxed">
           Each value: class mean of the per-group means, with 1 SD across submissions.
-        </p>
-      </section>
-
-      <section className="bg-paper border border-rule p-4">
-        <SpecLabel>Meadow diversity, grazed vs ungrazed</SpecLabel>
-        <PairedBars
-          bars={[
-            { label: "Marsh (ungrazed)", stat: meadow.marsh, color: MOSS },
-            { label: "Drained (grazed)", stat: meadow.drained, color: DRAINED }
-          ]}
-          yMax={1}
-          yLabel="Simpson's D"
-          decimals={2}
-        />
-        <p className="font-mono text-[10px] text-ink3 mt-2 leading-relaxed">
-          Bars: mean Simpson's D for the meadow quadrat, error whisker = 1 SD
-          across class submissions.
         </p>
       </section>
 

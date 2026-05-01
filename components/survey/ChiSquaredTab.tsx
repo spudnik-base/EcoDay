@@ -9,29 +9,32 @@ import ObservedTable from "./chi/ObservedTable";
 import ExpectedRow from "./chi/ExpectedRow";
 import CalcTable from "./chi/CalcTable";
 import Conclusion from "./chi/Conclusion";
-import { chiSquared, speciesOptions, type Habitat } from "@/lib/chiSquared";
+import { chiSquared, type Habitat } from "@/lib/chiSquared";
+import { CONFIG } from "@/lib/config";
 import { useClassData } from "@/lib/useClassData";
 
 export default function ChiSquaredTab() {
-  const [habitat, setHabitat] = useState<Habitat>("stream");
-  const [speciesId, setSpeciesId] = useState<string>("");
-  const { rows, status, refresh } = useClassData(false);
-  const speciesPickRef = useRef<HTMLDivElement | null>(null);
+  const [habitat, setHabitat]   = useState<Habitat>("stream");
+  const [speciesId1, setSp1]    = useState<string>("");
+  const [speciesId2, setSp2]    = useState<string>("");
+  const url = habitat === "stream"
+    ? CONFIG.WEBHOOK_URL_STREAM
+    : CONFIG.WEBHOOK_URL_MEADOW;
+  const { rows, status, refresh } = useClassData(url, false);
+  const sp1Ref = useRef<HTMLDivElement | null>(null);
 
-  const speciesLabel =
-    speciesOptions(habitat).find((o) => o.id === speciesId)?.label ?? "the species";
-
-  const habitatHint =
-    habitat === "stream"
-      ? "Counts are summed across all class submissions for each flow type."
-      : "Percent cover is converted to quadrat-square count (each square = 4%) and summed across submissions.";
+  function resetForHabitat(h: Habitat) {
+    setHabitat(h);
+    setSp1("");
+    setSp2("");
+  }
 
   return (
     <div className="pb-20 space-y-2">
       <Card>
         <p className="font-serif text-[14px] text-ink leading-relaxed">
-          Chi-squared (&chi;&sup2;) tests whether your observed data fits an
-          expected pattern. Goodness-of-fit, df = 1.
+          Chi-squared (&chi;&sup2;) test of association: do two species occur
+          together more (or less) than chance predicts? 2x2 contingency, df = 1.
         </p>
         <div className="mt-2 flex justify-between items-center">
           <span className="font-mono text-[10px] text-ink3">
@@ -47,13 +50,32 @@ export default function ChiSquaredTab() {
         </div>
       </Card>
 
-      <HabitatPick value={habitat} onChange={(h) => { setHabitat(h); setSpeciesId(""); }} />
-      <div ref={speciesPickRef}>
-        <SpeciesPick habitat={habitat} value={speciesId} onChange={setSpeciesId} />
+      <HabitatPick value={habitat} onChange={resetForHabitat} />
+
+      <div ref={sp1Ref}>
+        <SpeciesPick
+          habitat={habitat}
+          value={speciesId1}
+          onChange={setSp1}
+          step="2"
+          title="Pick the first species"
+          excludeId={speciesId2}
+        />
       </div>
 
-      {speciesId && (() => {
-        const result = chiSquared(rows, { habitat, speciesId });
+      {speciesId1 && (
+        <SpeciesPick
+          habitat={habitat}
+          value={speciesId2}
+          onChange={setSp2}
+          step="3"
+          title="Pick a second species"
+          excludeId={speciesId1}
+        />
+      )}
+
+      {speciesId1 && speciesId2 && (() => {
+        const result = chiSquared(rows, { habitat, speciesId1, speciesId2 });
         if (result.kind === "needData") {
           return (
             <Card>
@@ -61,60 +83,57 @@ export default function ChiSquaredTab() {
                 Cannot calculate yet: {result.reason}.
               </p>
               <p className="font-mono text-[11px] text-ink3 mt-2">
-                {result.labelA}: {result.nA} submissions. {result.labelB}: {result.nB} submissions.
+                {result.N} {result.labels.universe} so far.
               </p>
             </Card>
           );
         }
+        const { labels } = result;
         return (
           <>
-            <Hypotheses
-              speciesLabel={speciesLabel}
-              labelA={result.labelA}
-              labelB={result.labelB}
-            />
+            <Hypotheses sp1={labels.sp1} sp2={labels.sp2} universe={labels.universe} />
             <ObservedTable
-              labelA={result.labelA}
-              labelB={result.labelB}
-              oA={result.oA}
-              oB={result.oB}
-              nA={result.nA}
-              nB={result.nB}
-              habitatHint={habitatHint}
+              sp1={labels.sp1}
+              sp2={labels.sp2}
+              universe={labels.universe}
+              a={result.a} b={result.b} c={result.c} d={result.d}
+              row1={result.row1} row2={result.row2}
+              colA={result.colA} colB={result.colB}
+              N={result.N}
             />
             <ExpectedRow
-              oA={result.oA}
-              oB={result.oB}
-              eA={result.eA}
-              eB={result.eB}
-              labelA={result.labelA}
-              labelB={result.labelB}
+              sp1={labels.sp1} sp2={labels.sp2}
+              row1={result.row1} row2={result.row2}
+              colA={result.colA} colB={result.colB}
+              N={result.N}
+              ea={result.ea} eb={result.eb} ec={result.ec} ed={result.ed}
             />
             <CalcTable
-              oA={result.oA}
-              oB={result.oB}
-              eA={result.eA}
-              eB={result.eB}
+              cells={[
+                { label: `${labels.sp1} + ${labels.sp2} both present`, o: result.a, e: result.ea, c: result.ca },
+                { label: `${labels.sp1} only (no ${labels.sp2})`,      o: result.b, e: result.eb, c: result.cb },
+                { label: `${labels.sp2} only (no ${labels.sp1})`,      o: result.c, e: result.ec, c: result.cc },
+                { label: `Both absent`,                                o: result.d, e: result.ed, c: result.cd }
+              ]}
               chi={result.chi}
-              labelA={result.labelA}
-              labelB={result.labelB}
             />
             <Conclusion
               chi={result.chi}
               reject={result.reject}
+              positive={result.positive}
               warnLowExpected={result.warnLowExpected}
-              speciesLabel={speciesLabel}
-              labelA={result.labelA}
-              labelB={result.labelB}
+              sp1={labels.sp1}
+              sp2={labels.sp2}
             />
             <button
               onClick={() => {
-                setSpeciesId("");
-                speciesPickRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                setSp1("");
+                setSp2("");
+                sp1Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
               }}
               className="w-full h-11 px-3 mt-2 font-mono uppercase tracking-spec text-[11px] font-medium border border-ink bg-paper text-ink"
             >
-              Try another species
+              Try another pair
             </button>
           </>
         );

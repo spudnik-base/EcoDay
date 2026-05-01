@@ -1,10 +1,13 @@
 import Link from "next/link";
 
-type Props = { current: "survey" | "dashboard" };
+type Current = "survey" | "stream" | "meadow" | undefined;
 
-const ITEMS: ReadonlyArray<["survey" | "dashboard", string, string]> = [
-  ["survey",    "Survey",          "/"],
-  ["dashboard", "Class dashboard", "/dashboard"]
+type Props = { current: Current };
+
+const ITEMS: ReadonlyArray<["survey" | "stream" | "meadow", string, string]> = [
+  ["survey", "Survey",  "/"],
+  ["stream", "Stream",  "/dashboard/stream"],
+  ["meadow", "Meadow",  "/dashboard/meadow"]
 ];
 
 export default function TopNav({ current }: Props) {

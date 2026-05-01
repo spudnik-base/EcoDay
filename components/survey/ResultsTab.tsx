@@ -9,7 +9,8 @@ import AbioticSummaryTable from "./results/AbioticSummaryTable";
 import SpeciesFoundList from "./results/SpeciesFoundList";
 import SimpsonCalcDetails from "./results/SimpsonCalcDetails";
 import ExportButton from "./results/ExportButton";
-import SubmitButton from "./results/SubmitButton";
+import StreamSubmitSection from "./results/StreamSubmitSection";
+import MeadowSubmitSection from "./results/MeadowSubmitSection";
 import { MEADOW_LABELS, SPECIES } from "@/lib/constants";
 import { bioticIndex, fmt, simpsonsD } from "@/lib/calculations";
 import type { UseSurveyState } from "@/lib/useSurveyState";
@@ -75,10 +76,11 @@ export default function ResultsTab({ survey }: Props) {
       )}
       <AbioticSummaryTable ab={state.ab} />
       <SpeciesFoundList bio={state.bio} />
-      <div className="space-y-2 mt-3">
+      <div className="mt-3">
         <ExportButton state={state} />
-        <SubmitButton state={state} />
       </div>
+      <StreamSubmitSection state={state} onResetStream={survey.resetStream} />
+      <MeadowSubmitSection state={state} onResetMeadow={survey.resetMeadow} />
     </div>
   );
 }

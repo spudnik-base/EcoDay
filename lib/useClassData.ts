@@ -15,7 +15,10 @@ export type UseClassData = {
   refresh: () => void;
 };
 
-export function useClassData(autoRefresh = true): UseClassData {
+// Pass the URL of the Sheet you want to fetch. If you pass two distinct URLs
+// (stream and meadow) and want them merged, fetch each separately and
+// concatenate the rows in your component, or use useMergedClassData below.
+export function useClassData(url: string, autoRefresh = true): UseClassData {
   const [rows, setRows] = useState<ClassRow[]>([]);
   const [status, setStatus] = useState<FetchStatus>("idle");
   const [fetchedAt, setFetchedAt] = useState<Date | null>(null);
@@ -26,7 +29,7 @@ export function useClassData(autoRefresh = true): UseClassData {
   async function refresh() {
     setStatus("loading");
     try {
-      const res = await fetch(CONFIG.WEBHOOK_URL, { cache: "no-store" });
+      const res = await fetch(url, { cache: "no-store" });
       const data = (await res.json()) as ClassRow[];
       setRows(Array.isArray(data) ? data : []);
       setFetchedAt(new Date());
@@ -55,7 +58,7 @@ export function useClassData(autoRefresh = true): UseClassData {
       if (tickTimer.current) clearInterval(tickTimer.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [url]);
 
   return { rows, status, fetchedAt, countdown, refresh };
 }

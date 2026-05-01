@@ -54,6 +54,31 @@ export function useSurveyState() {
     commit(initialState());
   }
 
+  // Clear stream-side data only: site, flow, abiotic, biotic counts,
+  // and sensor readings. Keep group and meadow data intact so the
+  // afternoon meadow round is not lost.
+  function resetStream() {
+    const fresh = initialState();
+    commit({
+      ...state,
+      site: "",
+      flow: fresh.flow,
+      gps: fresh.gps,
+      ab:  fresh.ab,
+      bio: fresh.bio
+    });
+  }
+
+  // Clear meadow-side data only: meadow site toggle and quadrat covers.
+  // Keep group and stream data intact.
+  function resetMeadow() {
+    const fresh = initialState();
+    commit({
+      ...state,
+      mdw: fresh.mdw
+    });
+  }
+
   return {
     state,
     hydrated,
@@ -63,7 +88,9 @@ export function useSurveyState() {
     stepBio,
     setMeadowCover,
     setMeadowSite,
-    reset
+    reset,
+    resetStream,
+    resetMeadow
   };
 }
 
