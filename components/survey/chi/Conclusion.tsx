@@ -1,5 +1,6 @@
 import Card from "@/components/ui/Card";
 import SpecLabel from "@/components/ui/SpecLabel";
+import CochranNote from "../analysis/CochranNote";
 import { CRITICAL_CHI } from "@/lib/chiSquared";
 
 type Props = {
@@ -58,12 +59,7 @@ export default function Conclusion({
         >
           {verdict.txt}
         </div>
-        {warnLowExpected && (
-          <div className="mt-3 font-mono text-[10px] text-sepia leading-relaxed">
-            warning: at least one expected count is below 5. Cochran&apos;s rule
-            says chi-squared may be unreliable for small expected counts.
-          </div>
-        )}
+        {warnLowExpected && <CochranNote />}
       </Card>
       <Card>
         <SpecLabel>9. Interpret biologically</SpecLabel>
