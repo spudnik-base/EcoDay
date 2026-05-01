@@ -10,22 +10,29 @@ Data is submitted to a Google Sheet via a Google Apps Script web app.
 
 ## Year-to-year rollover
 
-Everything that changes year-to-year is in `lib/config.ts`. The webhook URL
-is intentionally hardcoded so students cannot break it from the UI.
+All year-specific config lives in `lib/config.ts`. The webhook URLs are
+intentionally hardcoded so students cannot change them from the UI.
 
-1. Create a fresh Google Sheet for the new cohort.
-2. In the sheet, open `Extensions > Apps Script`. Replace the contents with
-   the script in [Apps Script](#apps-script) below. Click `Deploy > New
-   deployment > Web app`. Set:
+EcoDay uses **two Google Sheets**: one for stream data, one for meadow data.
+
+1. Create two fresh Google Sheets for the new cohort: `EcoDay stream YEAR`
+   and `EcoDay meadow YEAR`.
+2. In each sheet, open `Extensions > Apps Script`. Paste the script from
+   [Apps Script](#apps-script) below. Click `Deploy > New deployment > Web app`.
+   Settings:
     - Execute as: Me
     - Who has access: Anyone
-   Click Deploy. Copy the resulting `/exec` URL.
+
+   Deploy and copy the resulting `/exec` URL. Repeat for the second sheet.
 3. Edit `lib/config.ts`:
-    - Replace `WEBHOOK_URL` with the new URL.
+    - Set `WEBHOOK_URL_STREAM` to the stream sheet URL.
+    - Set `WEBHOOK_URL_MEADOW` to the meadow sheet URL.
     - Bump `YEAR`.
 4. Commit and push to the deployment branch. Vercel rebuilds automatically.
 
-That's it. No environment variables, no admin UI, no shared password.
+If you only have one Sheet for testing, point both URLs at it. The dashboard
+tabs filter rows by which fields are populated, so stream and meadow rows
+can co-exist in a single Sheet.
 
 ## Apps Script
 
@@ -106,13 +113,18 @@ other half.
 ## Deploy
 
 1. Push to GitHub. Connect the repo to Vercel.
-2. No environment variables needed; the webhook URL is in code.
+2. No environment variables needed; the webhook URLs are in code.
 3. Vercel auto-deploys on push to the deployment branch.
 
-Two URLs to share with the field day:
+URLs to share:
 
 - Students: `<project>.vercel.app/`
-- Teacher dashboard: `<project>.vercel.app/dashboard`
+- Stream dashboard: `<project>.vercel.app/dashboard/stream`
+- Meadow dashboard: `<project>.vercel.app/dashboard/meadow`
+- Dashboard chooser: `<project>.vercel.app/dashboard`
+
+The TopNav at the top of every page provides quick toggling between Survey,
+Stream, and Meadow.
 
 HTTPS is required for the Geolocation and AmbientLightSensor APIs. Vercel
 provides this by default.
