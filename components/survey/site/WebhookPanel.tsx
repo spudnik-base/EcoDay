@@ -6,7 +6,6 @@ import { CONFIG } from "@/lib/config";
 
 export default function WebhookPanel() {
   const [open, setOpen] = useState(false);
-  const same = CONFIG.WEBHOOK_URL_STREAM === CONFIG.WEBHOOK_URL_MEADOW;
   return (
     <Card>
       <button
@@ -32,7 +31,7 @@ export default function WebhookPanel() {
           </div>
           <div>
             <div className="text-[10px] font-mono text-ink3 mb-1">
-              Meadow Sheet{same && " (same as stream)"}
+              Meadow Sheet
             </div>
             <div className="text-[10px] font-mono text-ink2 break-all bg-paper2/40 p-2 border border-rule">
               {CONFIG.WEBHOOK_URL_MEADOW}
