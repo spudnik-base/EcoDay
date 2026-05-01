@@ -10,6 +10,7 @@ import ExpectedRow from "../chi/ExpectedRow";
 import CalcTable from "../chi/CalcTable";
 import Conclusion from "../chi/Conclusion";
 import HypothesisPrimer from "./HypothesisPrimer";
+import PoolRiffleContext from "./PoolRiffleContext";
 import { chiSquared, type Habitat } from "@/lib/chiSquared";
 import type { ClassRow, FetchStatus } from "@/lib/useClassData";
 
@@ -57,6 +58,8 @@ export default function ChiSection({
       </Card>
 
       <HabitatPick value={habitat} onChange={resetForHabitat} />
+
+      {habitat === "stream" && <PoolRiffleContext />}
 
       <div ref={sp1Ref}>
         <SpeciesPick

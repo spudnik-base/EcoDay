@@ -1,7 +1,6 @@
 "use client";
 
 import ChiSection from "./analysis/ChiSection";
-import PoolRiffleContext from "./analysis/PoolRiffleContext";
 import ClassGlance from "./analysis/ClassGlance";
 import AdminCard from "./analysis/AdminCard";
 import { CONFIG } from "@/lib/config";
@@ -34,7 +33,6 @@ export default function AnalysisTab({ survey }: Props) {
         status={status}
         refresh={refresh}
       />
-      <PoolRiffleContext />
       <ClassGlance streamRows={stream.rows} meadowRows={meadow.rows} />
       <AdminCard survey={survey} />
     </div>
