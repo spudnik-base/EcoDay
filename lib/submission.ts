@@ -104,8 +104,8 @@ export function buildMeadowPayload(state: SurveyState): Record<string, unknown> 
   };
 }
 
-async function post(payload: Record<string, unknown>): Promise<void> {
-  await fetch(CONFIG.WEBHOOK_URL, {
+async function post(url: string, payload: Record<string, unknown>): Promise<void> {
+  await fetch(url, {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
@@ -114,9 +114,9 @@ async function post(payload: Record<string, unknown>): Promise<void> {
 }
 
 export async function submitStream(state: SurveyState): Promise<void> {
-  await post(buildStreamPayload(state));
+  await post(CONFIG.WEBHOOK_URL_STREAM, buildStreamPayload(state));
 }
 
 export async function submitMeadow(state: SurveyState): Promise<void> {
-  await post(buildMeadowPayload(state));
+  await post(CONFIG.WEBHOOK_URL_MEADOW, buildMeadowPayload(state));
 }

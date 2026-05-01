@@ -19,7 +19,10 @@ const TABS = ["Overview", "Summary", "Sites", "Compare", "Data"] as const;
 
 export default function DashboardPage() {
   const [tab, setTab] = useState(0);
-  const { rows, status, fetchedAt, countdown, refresh } = useClassData(true);
+  const { rows, status, fetchedAt, countdown, refresh } = useClassData(
+    CONFIG.WEBHOOK_URL_STREAM,
+    true
+  );
 
   const parsed = useMemo(() => rows.map(parseRow), [rows]);
 

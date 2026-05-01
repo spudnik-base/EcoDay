@@ -10,13 +10,17 @@ import ExpectedRow from "./chi/ExpectedRow";
 import CalcTable from "./chi/CalcTable";
 import Conclusion from "./chi/Conclusion";
 import { chiSquared, type Habitat } from "@/lib/chiSquared";
+import { CONFIG } from "@/lib/config";
 import { useClassData } from "@/lib/useClassData";
 
 export default function ChiSquaredTab() {
   const [habitat, setHabitat]   = useState<Habitat>("stream");
   const [speciesId1, setSp1]    = useState<string>("");
   const [speciesId2, setSp2]    = useState<string>("");
-  const { rows, status, refresh } = useClassData(false);
+  const url = habitat === "stream"
+    ? CONFIG.WEBHOOK_URL_STREAM
+    : CONFIG.WEBHOOK_URL_MEADOW;
+  const { rows, status, refresh } = useClassData(url, false);
   const sp1Ref = useRef<HTMLDivElement | null>(null);
 
   function resetForHabitat(h: Habitat) {
