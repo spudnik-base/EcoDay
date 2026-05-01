@@ -6,7 +6,7 @@
  *   - Cross-origin (Google Apps Script webhook): pass through, never cache.
  *     Both submission POSTs and dashboard GETs always go to the network.
  */
-const CACHE_VERSION = "ecoday-v1";
+const CACHE_VERSION = "ecoday-v2";
 const SHELL = ["/", "/dashboard"];
 
 self.addEventListener("install", (event) => {
