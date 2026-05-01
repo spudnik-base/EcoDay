@@ -29,15 +29,38 @@ That's it. No environment variables, no admin UI, no shared password.
 
 ## Apps Script
 
-Paste this into `Extensions > Apps Script` of the receiving Google Sheet:
+Paste this into `Extensions > Apps Script` of the receiving Google Sheet.
+This version aligns each row by header name, so adding new columns over
+time (for example the `submission_type` field that distinguishes stream
+from meadow rows) does not shift older data.
 
 ```js
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    if (sheet.getLastRow() === 0) sheet.appendRow(Object.keys(data));
-    sheet.appendRow(Object.values(data));
+
+    // existing headers (or none if sheet is empty)
+    var headers = [];
+    if (sheet.getLastRow() > 0) {
+      headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    }
+
+    // append any new keys to the header row
+    var newKeys = Object.keys(data).filter(function (k) {
+      return headers.indexOf(k) === -1;
+    });
+    if (newKeys.length > 0) {
+      headers = headers.concat(newKeys);
+      sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    }
+
+    // build the row in header order, blanks for missing keys
+    var row = headers.map(function (h) {
+      return data[h] === undefined ? "" : data[h];
+    });
+    sheet.appendRow(row);
+
     return ContentService.createTextOutput("OK");
   } catch (err) {
     return ContentService.createTextOutput("Error: " + err.message);
@@ -59,6 +82,26 @@ function doGet() {
     .setMimeType(ContentService.MimeType.JSON);
 }
 ```
+
+## Two submission types
+
+Each survey produces two independent submissions tagged in a
+`submission_type` column:
+
+- **stream** — group, site, flow, GPS, abiotic readings, biotic counts,
+  biotic index, Simpson&apos;s D for the stream.
+- **meadow** — group, marsh-or-drained, Simpson&apos;s D for the meadow,
+  percent cover for species A through P.
+
+Workflow: stream survey at the river in the morning, tap **Submit
+stream**. Walk to the meadow in the afternoon, tap **Submit meadow**.
+Each submission appends one row. Both rows live in the same Sheet but
+the dashboard charts filter by which fields are populated, so stream
+charts only count stream rows and meadow charts only count meadow rows.
+
+Each section has its own **Reset stream / Reset meadow** button so the
+next group or next site can start with a clean slate without losing the
+other half.
 
 ## Deploy
 

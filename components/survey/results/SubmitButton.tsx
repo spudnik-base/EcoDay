@@ -2,16 +2,21 @@
 
 import { useEffect, useRef, useState } from "react";
 import Button from "@/components/ui/Button";
-import { submitToSheets, buildPayload } from "@/lib/submission";
-import type { SurveyState } from "@/lib/types";
 
 type Status = "idle" | "loading" | "ok" | "error";
 
-const labels: Record<Status, string> = {
-  idle:    "Submit to Sheets",
-  loading: "Submitting...",
-  ok:      "Submitted",
-  error:   "Failed. Try CSV"
+type Props = {
+  // human label for idle state ("Submit stream", "Submit meadow")
+  label: string;
+  // performs the network call
+  submit: () => Promise<void>;
+  // returns a string snapshot of the relevant state slice. If this string
+  // changes after a successful submit, the button auto-rearms back to idle
+  // so the next submit can fire.
+  snapshot: () => string;
+  // a watch value that, when it changes, should re-evaluate the snapshot.
+  // Pass anything stable that updates when the slice updates.
+  watch: unknown;
 };
 
 const variantFor: Record<Status, "primary" | "ok" | "fail"> = {
@@ -21,36 +26,40 @@ const variantFor: Record<Status, "primary" | "ok" | "fail"> = {
   error:   "fail"
 };
 
-type Props = { state: SurveyState };
-
-export default function SubmitButton({ state }: Props) {
+export default function SubmitButton({ label, submit, snapshot, watch }: Props) {
   const [status, setStatus] = useState<Status>("idle");
-  const submittedSnapshot = useRef<string | null>(null);
+  const submitted = useRef<string | null>(null);
 
-  // Auto-rearm: if the user changes any value after a successful submit,
-  // reset to idle so the button becomes usable again. Avoids accidentally
-  // sending a duplicate row on a single tap, while letting groups correct
-  // a value and resubmit if they need to.
+  // Auto-rearm: if any value in the watched slice changes after a
+  // successful submit, the button becomes available again. Stops a stray
+  // double-tap from creating a duplicate row, but keeps re-submission
+  // possible after correcting a value or moving to another site.
   useEffect(() => {
     if (status !== "ok") return;
-    const current = JSON.stringify(buildPayload(state));
-    if (current !== submittedSnapshot.current) {
+    if (snapshot() !== submitted.current) {
       setStatus("idle");
-      submittedSnapshot.current = null;
+      submitted.current = null;
     }
-  }, [state, status]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watch, status]);
 
   async function go() {
     setStatus("loading");
     try {
-      const snapshot = JSON.stringify(buildPayload(state));
-      await submitToSheets(state);
-      submittedSnapshot.current = snapshot;
+      const snap = snapshot();
+      await submit();
+      submitted.current = snap;
       setStatus("ok");
     } catch {
       setStatus("error");
     }
   }
+
+  const label_ =
+    status === "loading" ? "Submitting..."
+    : status === "ok"    ? `${label.replace("Submit ", "")} sent`
+    : status === "error" ? "Failed. Try CSV"
+    : label;
 
   return (
     <Button
@@ -58,7 +67,7 @@ export default function SubmitButton({ state }: Props) {
       onClick={go}
       disabled={status === "loading" || status === "ok"}
     >
-      {labels[status]}
+      {label_}
     </Button>
   );
 }
