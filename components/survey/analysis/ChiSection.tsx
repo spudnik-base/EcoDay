@@ -41,7 +41,20 @@ export default function ChiSection({
   }
 
   return (
-    <div className="space-y-2">
+    <section className="border-2 border-ink bg-paper2/30 p-3 space-y-2">
+      <header className="px-1 -mt-1 -mx-1 mb-1 pb-2 border-b-2 border-ink">
+        <div className="font-mono uppercase tracking-spec text-[10px] text-ink3">
+          Field-day analysis
+        </div>
+        <h2 className="font-serif text-[20px] leading-tight text-ink">
+          &chi;&sup2; test of association
+        </h2>
+        <p className="font-mono text-[10px] text-ink3 mt-1 leading-relaxed">
+          Pick two species and test whether they tend to occur together,
+          avoid each other, or are unrelated.
+        </p>
+      </header>
+
       <HypothesisPrimer />
 
       <Card>
@@ -147,6 +160,6 @@ export default function ChiSection({
           </>
         );
       })()}
-    </div>
+    </section>
   );
 }
