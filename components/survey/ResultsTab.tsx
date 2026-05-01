@@ -10,7 +10,6 @@ import SpeciesFoundList from "./results/SpeciesFoundList";
 import SimpsonCalcDetails from "./results/SimpsonCalcDetails";
 import ExportButton from "./results/ExportButton";
 import StreamSubmitSection from "./results/StreamSubmitSection";
-import MeadowSubmitSection from "./results/MeadowSubmitSection";
 import { MEADOW_LABELS, SPECIES } from "@/lib/constants";
 import { bioticIndex, fmt, simpsonsD } from "@/lib/calculations";
 import type { UseSurveyState } from "@/lib/useSurveyState";
@@ -80,7 +79,9 @@ export default function ResultsTab({ survey }: Props) {
         <ExportButton state={state} />
       </div>
       <StreamSubmitSection state={state} onResetStream={survey.resetStream} />
-      <MeadowSubmitSection state={state} onResetMeadow={survey.resetMeadow} />
+      <p className="font-mono text-[10px] text-ink4 leading-relaxed mt-2 px-1">
+        Submit meadow lives on the Meadow tab.
+      </p>
     </div>
   );
 }
