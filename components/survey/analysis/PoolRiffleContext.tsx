@@ -1,17 +1,29 @@
+"use client";
+
+import { useState } from "react";
 import Card from "@/components/ui/Card";
-import SpecLabel from "@/components/ui/SpecLabel";
-import Disclosure from "@/components/ui/Disclosure";
 
 export default function PoolRiffleContext() {
+  const [open, setOpen] = useState(false);
   return (
     <Card>
-      <SpecLabel>Pool vs riffle, what to expect</SpecLabel>
-      <p className="font-serif text-[13px] text-ink leading-relaxed">
-        Riffles and pools are different habitats, not better or worse versions
-        of each other.
-      </p>
-      <Disclosure label="ecological context">
-        <div className="space-y-2">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex justify-between items-center"
+      >
+        <span className="text-[10px] font-mono uppercase tracking-spec text-ink3">
+          Pool vs riffle, what to expect
+        </span>
+        <span className="text-[10px] font-mono text-ink4">
+          {open ? "hide" : "show"}
+        </span>
+      </button>
+      {open && (
+        <div className="mt-3 space-y-2">
+          <p className="font-serif text-[13px] text-ink leading-relaxed">
+            Riffles and pools are different habitats, not better or worse
+            versions of each other.
+          </p>
           <p className="font-serif text-[13px] text-ink leading-relaxed">
             <span className="font-medium">Riffles</span>: shallow, fast,
             tumbling. Water folds in air which raises dissolved oxygen.
@@ -21,8 +33,8 @@ export default function PoolRiffleContext() {
           <p className="font-serif text-[13px] text-ink leading-relaxed">
             <span className="font-medium">Pools</span>: deeper, slower,
             sometimes warmer. Lower dissolved oxygen. Sediment settles, so
-            substrate is finer. Different community: detritus feeders,
-            scuds, leeches, and species that can tolerate lower oxygen.
+            substrate is finer. Different community: detritus feeders, scuds,
+            leeches, and species that can tolerate lower oxygen.
           </p>
           <p className="font-serif text-[13px] text-ink3 leading-relaxed">
             A different biotic index between pool and riffle is expected. The
@@ -31,7 +43,7 @@ export default function PoolRiffleContext() {
             the ecology?&rdquo;
           </p>
         </div>
-      </Disclosure>
+      )}
     </Card>
   );
 }
