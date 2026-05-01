@@ -1,6 +1,7 @@
 "use client";
 
 import SpecLabel from "@/components/ui/SpecLabel";
+import ErrorBarHint from "@/components/ui/ErrorBarHint";
 import StatPair from "./summary/StatPair";
 import PairedBars from "./summary/PairedBars";
 import SiteMeansChart from "./summary/SiteMeansChart";
@@ -67,20 +68,17 @@ export default function SummaryTab({ rows }: Props) {
           yLabel="Biotic index"
           decimals={1}
         />
-        <p className="font-mono text-[10px] text-ink3 mt-2 leading-relaxed">
-          Bars: mean biotic index across submissions of each flow type, error
-          whisker = 1 SD.
-        </p>
+        <ErrorBarHint />
       </section>
 
       <section className="bg-paper border border-rule p-4">
         <SpecLabel>Mean biotic index per site</SpecLabel>
         <SiteMeansChart perSite={sitePerSite} yMax={20} yLabel="BI" />
         <p className="font-mono text-[10px] text-ink3 mt-2 leading-relaxed">
-          Bars: mean BI per site (multiple groups same site = real SD).
           Empty sites: no submissions yet. Dashed lines: BI 10 and BI 3
           quality thresholds.
         </p>
+        <ErrorBarHint />
       </section>
     </div>
   );

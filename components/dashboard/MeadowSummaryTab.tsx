@@ -1,6 +1,7 @@
 "use client";
 
 import SpecLabel from "@/components/ui/SpecLabel";
+import ErrorBarHint from "@/components/ui/ErrorBarHint";
 import StatPair from "./summary/StatPair";
 import PairedBars from "./summary/PairedBars";
 import CoverByLetterChart from "./meadow/CoverByLetterChart";
@@ -53,19 +54,17 @@ export default function MeadowSummaryTab({ rows }: Props) {
           yLabel="Simpson's D"
           decimals={2}
         />
-        <p className="font-mono text-[10px] text-ink3 mt-2 leading-relaxed">
-          Whisker = 1 SD across class submissions in each habitat type.
-        </p>
+        <ErrorBarHint />
       </section>
 
       <section className="bg-paper border border-rule p-4">
         <SpecLabel>Per-species cover, marsh vs drained</SpecLabel>
         <CoverByLetterChart rows={cover} />
         <p className="font-mono text-[10px] text-ink3 mt-2 leading-relaxed">
-          Each letter is a quadrat species (A through P). Bars: mean % cover
-          across submissions, with 1 SD whisker. Marsh in moss green, drained
-          in amber.
+          Each letter is a quadrat species (A through P). Marsh in moss green,
+          drained in amber.
         </p>
+        <ErrorBarHint />
       </section>
     </div>
   );
