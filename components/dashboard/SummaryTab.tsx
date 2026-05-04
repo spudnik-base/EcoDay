@@ -5,6 +5,9 @@ import ErrorBarHint from "@/components/ui/ErrorBarHint";
 import StatPair from "./summary/StatPair";
 import PairedBars from "./summary/PairedBars";
 import SiteMeansChart from "./summary/SiteMeansChart";
+import AbioticPerSite from "./summary/AbioticPerSite";
+import AbioticPoolRiffle from "./summary/AbioticPoolRiffle";
+import AbioticVsBI from "./summary/AbioticVsBI";
 import { CONFIG } from "@/lib/config";
 import {
   abioticStats,
@@ -80,6 +83,10 @@ export default function SummaryTab({ rows }: Props) {
         </p>
         <ErrorBarHint />
       </section>
+
+      <AbioticPerSite rows={rows} />
+      <AbioticPoolRiffle rows={rows} />
+      <AbioticVsBI rows={rows} />
     </div>
   );
 }
