@@ -6,13 +6,14 @@ import Disclosure from "@/components/ui/Disclosure";
 import GroupGrid from "../site/GroupGrid";
 import MeadowSiteToggle from "./MeadowSiteToggle";
 import CoverInput from "./CoverInput";
+import MeadowSubmitSection from "../results/MeadowSubmitSection";
 import { MEADOW_LABELS } from "@/lib/constants";
 import type { UseSurveyState } from "@/lib/useSurveyState";
 
 type Props = { survey: UseSurveyState };
 
 export default function SurveySection({ survey }: Props) {
-  const { state, update, setMeadowSite, setMeadowCover } = survey;
+  const { state, update, setMeadowSite, setMeadowCover, resetMeadow } = survey;
   return (
     <div>
       <GroupGrid current={state.group} onPick={(v) => update({ group: v })} />
@@ -56,7 +57,7 @@ export default function SurveySection({ survey }: Props) {
           at.
         </p>
       </Card>
-      <div className="grid grid-cols-2 gap-1.5">
+      <div className="grid grid-cols-2 gap-1.5 mb-3">
         {MEADOW_LABELS.map((l) => (
           <CoverInput
             key={l}
@@ -66,6 +67,8 @@ export default function SurveySection({ survey }: Props) {
           />
         ))}
       </div>
+      <MeadowSubmitSection state={state} onResetMeadow={resetMeadow} />
     </div>
   );
 }
+

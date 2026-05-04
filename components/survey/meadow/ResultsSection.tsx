@@ -4,7 +4,6 @@ import Card from "@/components/ui/Card";
 import SpecLabel from "@/components/ui/SpecLabel";
 import Disclosure from "@/components/ui/Disclosure";
 import SimpsonCalcDetails from "../results/SimpsonCalcDetails";
-import MeadowSubmitSection from "../results/MeadowSubmitSection";
 import SimpsonInterpretation from "../SimpsonInterpretation";
 import { MEADOW_LABELS } from "@/lib/constants";
 import { fmt, simpsonsD } from "@/lib/calculations";
@@ -13,7 +12,7 @@ import type { UseSurveyState } from "@/lib/useSurveyState";
 type Props = { survey: UseSurveyState };
 
 export default function ResultsSection({ survey }: Props) {
-  const { state, resetMeadow } = survey;
+  const { state } = survey;
   const dMeadow = simpsonsD(MEADOW_LABELS.map((l) => state.mdw.cover[l] ?? ""));
   const meadowRows = MEADOW_LABELS.map((l) => ({
     name: `Species ${l}`,
@@ -67,7 +66,9 @@ export default function ResultsSection({ survey }: Props) {
           </div>
         </Disclosure>
       </Card>
-      <MeadowSubmitSection state={state} onResetMeadow={resetMeadow} />
+      <p className="font-mono text-[10px] text-ink4 leading-relaxed mt-2 px-1">
+        Submit meadow lives at the bottom of the Survey sub-tab.
+      </p>
     </div>
   );
 }
