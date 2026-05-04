@@ -32,6 +32,29 @@ export default function SurveySection({ survey }: Props) {
             for how much that species contributes to the meadow.
           </p>
         </Disclosure>
+        <Disclosure label="how to take a random sample">
+          <ol className="font-serif text-[13px] text-ink leading-relaxed list-decimal pl-5 space-y-1">
+            <li>Agree as a class on species labels A, B, C... and photograph
+              the reference card. Everyone uses the same letters.</li>
+            <li>Lay out two 30 m tape measures at right angles to define a
+              sampling grid.</li>
+            <li>Generate a random pair of coordinates (e.g. roll dice or use
+              a random-number app).</li>
+            <li>Place the 1 x 1 m quadrat with its top-left corner at that
+              coordinate. Don&apos;t move it once it&apos;s down.</li>
+            <li>For each species, estimate % cover (each of the 25 quadrat
+              squares = 4%). If unsure, count the squares the species
+              occupies and multiply by 4.</li>
+            <li>Repeat at multiple random coordinates if time allows; each
+              quadrat is a separate submission to the meadow Sheet.</li>
+          </ol>
+        </Disclosure>
+        <p className="font-mono text-[10px] text-ink3 leading-relaxed mt-2">
+          Tip: <span className="font-medium text-ink2">Seek by iNaturalist</span>
+          {" "}is a free phone app. Point the camera at a plant and it suggests
+          a species. Useful when you&apos;re not sure what you&apos;re looking
+          at.
+        </p>
       </Card>
       <div className="grid grid-cols-2 gap-1.5">
         {MEADOW_LABELS.map((l) => (

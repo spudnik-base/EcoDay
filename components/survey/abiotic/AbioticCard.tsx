@@ -2,11 +2,17 @@
 
 import Card from "@/components/ui/Card";
 import Field from "@/components/ui/Field";
+import Disclosure from "@/components/ui/Disclosure";
 import { fmt, mean, stdDev } from "@/lib/calculations";
 import type { AbioticKey } from "@/lib/constants";
 
 type Props = {
-  factor: { key: AbioticKey; label: string; unit: string };
+  factor: {
+    key: AbioticKey;
+    label: string;
+    unit: string;
+    methodNote?: string;
+  };
   values: [string, string, string];
   onChange: (i: 0 | 1 | 2, v: string) => void;
 };
@@ -40,6 +46,13 @@ export default function AbioticCard({ factor, values, onChange }: Props) {
           />
         ))}
       </div>
+      {factor.methodNote && (
+        <Disclosure label="how to measure">
+          <p className="font-serif text-[13px] text-ink leading-relaxed">
+            {factor.methodNote}
+          </p>
+        </Disclosure>
+      )}
     </Card>
   );
 }

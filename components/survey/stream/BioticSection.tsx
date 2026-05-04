@@ -28,6 +28,24 @@ export default function BioticSection({ survey }: Props) {
             Replicate two or three times for a representative sample.
           </p>
         </Disclosure>
+        <Disclosure label="what is a biological indicator?">
+          <div className="space-y-2">
+            <p className="font-serif text-[13px] text-ink leading-relaxed">
+              An organism whose presence (or absence) tells you something
+              about the condition of an ecosystem. Macroinvertebrates are
+              ideal: they live for months in one stretch of stream, can&apos;t
+              easily move when conditions change, and different species
+              tolerate very different levels of pollution and oxygen.
+            </p>
+            <p className="font-serif text-[13px] text-ink leading-relaxed">
+              A single chemistry reading is a snapshot. Indicator species
+              integrate weeks or months of conditions, so a kick sample can
+              reveal pollution that a one-off pH probe might miss. This is
+              why monitoring agencies still use macroinvertebrate sampling
+              alongside automated chemistry.
+            </p>
+          </div>
+        </Disclosure>
       </Card>
       <ToleranceExplainer />
       <Card>

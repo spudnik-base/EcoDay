@@ -1,5 +1,6 @@
 "use client";
 
+import AboutFieldDay from "./analysis/AboutFieldDay";
 import ChiSection from "./analysis/ChiSection";
 import ClassGlance from "./analysis/ClassGlance";
 import AdminCard from "./analysis/AdminCard";
@@ -27,6 +28,7 @@ export default function AnalysisTab({ survey }: Props) {
 
   return (
     <div className="pb-20 space-y-2">
+      <AboutFieldDay />
       <ChiSection
         streamRows={stream.rows}
         meadowRows={meadow.rows}

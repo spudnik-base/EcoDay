@@ -32,6 +32,15 @@ export default function AbioticSection({ survey }: Props) {
         <Disclosure label="what do x&#772; and SD mean?">
           <AbioticSdExplainer ab={state.ab} />
         </Disclosure>
+        <Disclosure label="why standardise the method?">
+          <p className="font-serif text-[13px] text-ink leading-relaxed">
+            Every group should measure the same way: probe in the middle of
+            the column, ruler vertical to the bed, three repeats. That makes
+            your readings comparable to other sites this year and to readings
+            from previous years. If methods drift, differences in the data
+            could just be differences in technique, not in the river.
+          </p>
+        </Disclosure>
       </Card>
       {ABIOTIC_FIELDS.map((f) => (
         <AbioticCard
