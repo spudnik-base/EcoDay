@@ -5,13 +5,14 @@ import SpecLabel from "@/components/ui/SpecLabel";
 import Disclosure from "@/components/ui/Disclosure";
 import SpeciesRow from "../biotic/SpeciesRow";
 import ToleranceExplainer from "../biotic/ToleranceExplainer";
+import StreamSubmitSection from "../results/StreamSubmitSection";
 import { SPECIES } from "@/lib/constants";
 import type { UseSurveyState } from "@/lib/useSurveyState";
 
 type Props = { survey: UseSurveyState };
 
 export default function BioticSection({ survey }: Props) {
-  const { state, stepBio } = survey;
+  const { state, stepBio, resetStream } = survey;
   return (
     <div>
       <Card>
@@ -60,6 +61,8 @@ export default function BioticSection({ survey }: Props) {
           />
         ))}
       </Card>
+      <StreamSubmitSection state={state} onResetStream={resetStream} />
     </div>
   );
 }
+

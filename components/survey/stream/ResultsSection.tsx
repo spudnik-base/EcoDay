@@ -9,7 +9,6 @@ import AbioticSummaryTable from "../results/AbioticSummaryTable";
 import SpeciesFoundList from "../results/SpeciesFoundList";
 import SimpsonCalcDetails from "../results/SimpsonCalcDetails";
 import ExportButton from "../results/ExportButton";
-import StreamSubmitSection from "../results/StreamSubmitSection";
 import QualityBandsExplainer from "./QualityBandsExplainer";
 import SimpsonInterpretation from "../SimpsonInterpretation";
 import { SPECIES } from "@/lib/constants";
@@ -19,7 +18,7 @@ import type { UseSurveyState } from "@/lib/useSurveyState";
 type Props = { survey: UseSurveyState };
 
 export default function ResultsSection({ survey }: Props) {
-  const { state, resetStream } = survey;
+  const { state } = survey;
   const bi = bioticIndex(state.bio);
   const dStream = simpsonsD(SPECIES.map((s) => state.bio[s.id]));
   const showSensors = state.gps.alt || state.gps.lux != null;
@@ -71,7 +70,9 @@ export default function ResultsSection({ survey }: Props) {
       <div className="mt-3">
         <ExportButton state={state} />
       </div>
-      <StreamSubmitSection state={state} onResetStream={resetStream} />
+      <p className="font-mono text-[10px] text-ink4 leading-relaxed mt-2 px-1">
+        Submit stream lives at the bottom of the Biotic sub-tab.
+      </p>
     </div>
   );
 }
