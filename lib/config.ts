@@ -16,7 +16,7 @@ export const CONFIG = {
     "https://script.google.com/macros/s/AKfycbyf8etVUXXtA5XNlfZ4KGCkDpCxN15hdCTeWt1HcElTS2RXMEv1DG3RqdLFU0CYjRyqFA/exec",
   WEBHOOK_URL_MEADOW:
     "https://script.google.com/macros/s/AKfycbwHladItVH-F2THYq9lADHNaXaE0SbBrO84GQfu_kDi5V5QJcVKkFKzkEcLQruVfl9ZWg/exec",
-  EXIT_TICKET_STREAM_URL: "",
+  EXIT_TICKET_STREAM_URL: "https://forms.gle/jUm2k2UWutxbMq587",
   EXIT_TICKET_MEADOW_URL: "",
   YEAR:         2026,
   SITE_COUNT:   10,
