@@ -3,27 +3,35 @@
 // at any size and inherit colour from the parent (currentColor).
 import Stonefly from "./icons/Stonefly";
 import Mayfly from "./icons/Mayfly";
+import UncasedCaddis from "./icons/UncasedCaddis";
 import CasedCaddis from "./icons/CasedCaddis";
-import Leech from "./icons/Leech";
-import SegWorm from "./icons/SegWorm";
-import Damsel from "./icons/Damsel";
-import Shrimp from "./icons/Shrimp";
+import RiffleBeetle from "./icons/RiffleBeetle";
+import WaterPenny from "./icons/WaterPenny";
 import FlatWorm from "./icons/FlatWorm";
+import Damsel from "./icons/Damsel";
 import BlackFly from "./icons/BlackFly";
 import BeetleLarva from "./icons/BeetleLarva";
+import Snail from "./icons/Snail";
+import Shrimp from "./icons/Shrimp";
+import Leech from "./icons/Leech";
+import SegWorm from "./icons/SegWorm";
 import type { SpeciesId } from "@/lib/constants";
 
-const REGISTRY: Partial<Record<SpeciesId, React.ComponentType<{ className?: string }>>> = {
-  stonefly: Stonefly,
-  mayfly:   Mayfly,
-  cased:    CasedCaddis,
-  leech:    Leech,
-  segworm:  SegWorm,
-  damsel:   Damsel,
-  shrimp:   Shrimp,
-  flatworm: FlatWorm,
-  blackfly: BlackFly,
-  beetle:   BeetleLarva
+const REGISTRY: Record<SpeciesId, React.ComponentType<{ className?: string }>> = {
+  stonefly:   Stonefly,
+  mayfly:     Mayfly,
+  uncased:    UncasedCaddis,
+  cased:      CasedCaddis,
+  riffle:     RiffleBeetle,
+  waterpenny: WaterPenny,
+  flatworm:   FlatWorm,
+  damsel:     Damsel,
+  blackfly:   BlackFly,
+  beetle:     BeetleLarva,
+  snail:      Snail,
+  shrimp:     Shrimp,
+  leech:      Leech,
+  segworm:    SegWorm
 };
 
 type Props = {
@@ -33,6 +41,5 @@ type Props = {
 
 export default function SpeciesIcon({ id, className }: Props) {
   const Icon = REGISTRY[id];
-  if (!Icon) return null;
   return <Icon className={className} />;
 }
