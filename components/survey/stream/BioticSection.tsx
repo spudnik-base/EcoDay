@@ -53,6 +53,7 @@ export default function BioticSection({ survey }: Props) {
         {SPECIES.map((sp, i) => (
           <SpeciesRow
             key={sp.id}
+            id={sp.id}
             name={sp.name}
             tol={sp.tol}
             count={state.bio[sp.id] || 0}
