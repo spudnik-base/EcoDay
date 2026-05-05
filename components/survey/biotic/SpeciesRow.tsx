@@ -2,7 +2,7 @@
 
 import Stepper from "@/components/ui/Stepper";
 import ToleranceLabel from "./ToleranceLabel";
-import SpeciesIcon from "@/components/species/SpeciesIcon";
+import SpeciesPreview from "@/components/species/SpeciesPreview";
 import type { SpeciesId } from "@/lib/constants";
 
 type Props = {
@@ -29,9 +29,7 @@ export default function SpeciesRow({
         isLast ? "" : "border-b border-rule/60"
       ].join(" ")}
     >
-      <div className="w-10 h-10 shrink-0 flex items-center justify-center text-ink2">
-        <SpeciesIcon id={id} className="w-full h-full" />
-      </div>
+      <SpeciesPreview id={id} />
       <div className="flex-1 min-w-0">
         <div className="font-serif text-[15px] text-ink leading-tight">{name}</div>
         <ToleranceLabel tol={tol} />
