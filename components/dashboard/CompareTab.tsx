@@ -1,6 +1,7 @@
 import SpecLabel from "@/components/ui/SpecLabel";
 import FlowCompare from "./compare/FlowCompare";
 import DiversityBySite from "./compare/DiversityBySite";
+import AbioticVsBI from "./summary/AbioticVsBI";
 import type { ParsedRow } from "@/lib/parseRow";
 
 type Props = { rows: ParsedRow[] };
@@ -13,6 +14,7 @@ export default function CompareTab({ rows }: Props) {
         <FlowCompare rows={rows} />
       </section>
       <DiversityBySite rows={rows} />
+      <AbioticVsBI rows={rows} />
     </div>
   );
 }
