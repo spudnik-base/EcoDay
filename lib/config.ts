@@ -7,12 +7,17 @@
 //   3. Copy each /exec URL.
 //   4. Replace WEBHOOK_URL_STREAM and WEBHOOK_URL_MEADOW below.
 //   5. Bump YEAR.
-//   6. Commit and push. Vercel auto-deploys.
+//   6. Optional: create two Google Forms for the exit tickets, paste their
+//      shareable URLs in EXIT_TICKET_STREAM_URL and EXIT_TICKET_MEADOW_URL.
+//      Leave as "" to hide the exit-ticket buttons.
+//   7. Commit and push. Vercel auto-deploys.
 export const CONFIG = {
   WEBHOOK_URL_STREAM:
     "https://script.google.com/macros/s/AKfycbyf8etVUXXtA5XNlfZ4KGCkDpCxN15hdCTeWt1HcElTS2RXMEv1DG3RqdLFU0CYjRyqFA/exec",
   WEBHOOK_URL_MEADOW:
     "https://script.google.com/macros/s/AKfycbwHladItVH-F2THYq9lADHNaXaE0SbBrO84GQfu_kDi5V5QJcVKkFKzkEcLQruVfl9ZWg/exec",
+  EXIT_TICKET_STREAM_URL: "",
+  EXIT_TICKET_MEADOW_URL: "",
   YEAR:         2026,
   SITE_COUNT:   10,
   GROUP_COUNT:  10,

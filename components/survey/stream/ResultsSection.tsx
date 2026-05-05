@@ -9,6 +9,7 @@ import AbioticSummaryTable from "../results/AbioticSummaryTable";
 import SpeciesFoundList from "../results/SpeciesFoundList";
 import SimpsonCalcDetails from "../results/SimpsonCalcDetails";
 import ExportButton from "../results/ExportButton";
+import ExitTicketCard from "../results/ExitTicketCard";
 import QualityBandsExplainer from "./QualityBandsExplainer";
 import SimpsonInterpretation from "../SimpsonInterpretation";
 import { SPECIES } from "@/lib/constants";
@@ -73,6 +74,7 @@ export default function ResultsSection({ survey }: Props) {
       <p className="font-mono text-[10px] text-ink4 leading-relaxed mt-2 px-1">
         Submit stream lives at the bottom of the Biotic sub-tab.
       </p>
+      <ExitTicketCard habitat="stream" />
     </div>
   );
 }

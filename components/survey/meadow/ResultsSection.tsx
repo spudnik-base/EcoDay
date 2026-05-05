@@ -4,6 +4,7 @@ import Card from "@/components/ui/Card";
 import SpecLabel from "@/components/ui/SpecLabel";
 import Disclosure from "@/components/ui/Disclosure";
 import SimpsonCalcDetails from "../results/SimpsonCalcDetails";
+import ExitTicketCard from "../results/ExitTicketCard";
 import SimpsonInterpretation from "../SimpsonInterpretation";
 import { MEADOW_LABELS } from "@/lib/constants";
 import { fmt, simpsonsD } from "@/lib/calculations";
@@ -69,6 +70,7 @@ export default function ResultsSection({ survey }: Props) {
       <p className="font-mono text-[10px] text-ink4 leading-relaxed mt-2 px-1">
         Submit meadow lives at the bottom of the Survey sub-tab.
       </p>
+      <ExitTicketCard habitat="meadow" />
     </div>
   );
 }
