@@ -6,6 +6,7 @@ import Disclosure from "@/components/ui/Disclosure";
 import GroupGrid from "../site/GroupGrid";
 import MeadowSiteToggle from "./MeadowSiteToggle";
 import CoverInput from "./CoverInput";
+import RandomCoord from "./RandomCoord";
 import MeadowSubmitSection from "../results/MeadowSubmitSection";
 import { MEADOW_LABELS } from "@/lib/constants";
 import type { UseSurveyState } from "@/lib/useSurveyState";
@@ -57,6 +58,7 @@ export default function SurveySection({ survey }: Props) {
           at.
         </p>
       </Card>
+      <RandomCoord />
       <div className="grid grid-cols-2 gap-1.5 mb-3">
         {MEADOW_LABELS.map((l) => (
           <CoverInput
