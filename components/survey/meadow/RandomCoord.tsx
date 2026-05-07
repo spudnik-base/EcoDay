@@ -4,21 +4,22 @@ import { useState } from "react";
 import Card from "@/components/ui/Card";
 import SpecLabel from "@/components/ui/SpecLabel";
 
-// Random pair of coordinates for placing a quadrat. Students set the
-// range to match their tape-measure length (default 0-100). 'Roll'
-// gives a fresh pair. Decoupled from survey state so it never touches
-// the submission.
+// Random pair of coordinates for placing a quadrat. Two tape measures
+// are laid out at right angles, one along x and one along y. Students
+// set the max value of each tape (lengths can differ if the plot isn't
+// square) and roll a fresh pair. Decoupled from survey state so it
+// never touches the submission.
 export default function RandomCoord() {
-  const [min, setMin] = useState("0");
-  const [max, setMax] = useState("100");
+  const [maxX, setMaxX] = useState("100");
+  const [maxY, setMaxY] = useState("100");
   const [pair, setPair] = useState<{ x: number; y: number } | null>(null);
 
   function roll() {
-    const lo = parseFloat(min);
-    const hi = parseFloat(max);
-    if (Number.isNaN(lo) || Number.isNaN(hi) || hi <= lo) return;
-    const x = Math.round(lo + Math.random() * (hi - lo));
-    const y = Math.round(lo + Math.random() * (hi - lo));
+    const xHi = parseFloat(maxX);
+    const yHi = parseFloat(maxY);
+    if (Number.isNaN(xHi) || Number.isNaN(yHi) || xHi <= 0 || yHi <= 0) return;
+    const x = Math.round(Math.random() * xHi);
+    const y = Math.round(Math.random() * yHi);
     setPair({ x, y });
   }
 
@@ -26,28 +27,34 @@ export default function RandomCoord() {
     <Card>
       <SpecLabel>Random coordinate</SpecLabel>
       <p className="font-mono text-[10px] text-ink3 leading-relaxed mb-2">
-        Set the range to match your tape measure length, then roll a pair to
+        Set the maximum value of each tape measure, then roll a pair to
         decide where the quadrat&apos;s top-left corner goes.
       </p>
-      <div className="flex items-center gap-2 mb-3">
-        <span className="font-mono text-[10px] uppercase tracking-spec text-ink3">
-          Range
-        </span>
-        <input
-          type="number"
-          value={min}
-          onChange={(e) => setMin(e.target.value)}
-          className="w-16 h-9 px-2 text-center text-[13px] border border-rule focus:border-ink"
-          aria-label="Minimum"
-        />
-        <span className="font-mono text-[10px] text-ink3">to</span>
-        <input
-          type="number"
-          value={max}
-          onChange={(e) => setMax(e.target.value)}
-          className="w-16 h-9 px-2 text-center text-[13px] border border-rule focus:border-ink"
-          aria-label="Maximum"
-        />
+      <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-center gap-1.5">
+          <span className="font-mono text-[10px] uppercase tracking-spec text-ink3">
+            max x
+          </span>
+          <input
+            type="number"
+            value={maxX}
+            onChange={(e) => setMaxX(e.target.value)}
+            className="w-16 h-9 px-2 text-center text-[13px] border border-rule focus:border-ink"
+            aria-label="Maximum x"
+          />
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="font-mono text-[10px] uppercase tracking-spec text-ink3">
+            max y
+          </span>
+          <input
+            type="number"
+            value={maxY}
+            onChange={(e) => setMaxY(e.target.value)}
+            className="w-16 h-9 px-2 text-center text-[13px] border border-rule focus:border-ink"
+            aria-label="Maximum y"
+          />
+        </div>
       </div>
       {pair && (
         <div className="flex items-baseline gap-4 bg-paper2/40 border border-rule px-3 py-2 mb-2">
