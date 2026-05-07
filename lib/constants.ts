@@ -64,4 +64,4 @@ export const ABIOTIC_FIELDS = [
 
 export type AbioticKey = (typeof ABIOTIC_FIELDS)[number]["key"];
 
-export const MEADOW_LABELS = "ABCDEFGHIJKLMNOP".split("");
+export const MEADOW_LABELS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
